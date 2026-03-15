@@ -1,6 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { useState } from "react";
-import { createSupabaseBrowserClient } from "../../lib/supabase";
+import { createSupabaseServerClient } from "../../lib/supabase";
+
+export const sendPasswordResetEmail = createServerFn({ method: "POST" })
+	.inputValidator(
+		(data: unknown) => data as { email: string; redirectTo: string },
+	)
+	.handler(async ({ data }) => {
+		const supabase = createSupabaseServerClient(getRequest());
+		const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+			redirectTo: data.redirectTo,
+		});
+		if (error) {
+			return { success: false, error: error.message };
+		}
+		return { success: true };
+	});
 
 export const Route = createFileRoute("/admin/forgot-password")({
 	component: ForgotPasswordComponent,
@@ -19,13 +36,14 @@ function ForgotPasswordComponent() {
 		setIsLoading(true);
 
 		try {
-			// Use browser client so the PKCE code verifier is stored in browser cookies
-			const supabase = createSupabaseBrowserClient();
-			const { error } = await supabase.auth.resetPasswordForEmail(email, {
-				redirectTo: `${window.location.origin}/auth/callback?next=/admin/reset-password`,
+			const result = await sendPasswordResetEmail({
+				data: {
+					email,
+					redirectTo: `${window.location.origin}/auth/callback?next=/admin/reset-password`,
+				},
 			});
-			if (error) {
-				setError(error.message);
+			if (!result.success) {
+				setError(result.error ?? "Failed to send reset email");
 			} else {
 				setMsg("Password reset email sent! Please check your inbox.");
 			}

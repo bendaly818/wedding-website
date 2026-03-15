@@ -1,74 +1,96 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
-import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { useEffect, useState } from "react";
+import { createSupabaseBrowserClient } from "#/lib/supabase-browser";
 import { createSupabaseServerClient } from "../../lib/supabase";
 
-export const Route = createFileRoute("/auth/callback")({
-	server: {
-		handlers: {
-			GET: async ({ request }) => {
-				const supabase = createSupabaseServerClient(request);
-				const url = new URL(request.url);
-				const code = url.searchParams.get("code");
-				const token_hash = url.searchParams.get("token_hash");
-				const type = url.searchParams.get("type") as EmailOtpType;
-				const next = url.searchParams.get("next") || "/admin";
-
-				if (token_hash && type) {
-					const { error } = await supabase.auth.verifyOtp({
-						token_hash,
-						type,
-					});
-					if (!error) {
-						throw redirect({ to: next });
-					} else {
-						console.error("Auth callback OTP error:", error);
-						throw redirect({
-							to: "/admin/login",
-							search: { error: error.message },
-						});
-					}
-				}
-
-				if (code) {
-					const { error } = await supabase.auth.exchangeCodeForSession(code);
-					if (!error) {
-						throw redirect({ to: next });
-					} else {
-						console.error("Auth callback code error:", error);
-						throw redirect({
-							to: "/admin/login",
-							search: { error: error.message },
-						});
-					}
-				}
-
-				throw redirect({
-					to: "/admin/login",
-					search: { error: "No code or token provided for authentication." },
-				});
+const exchangeAuthCode = createServerFn({ method: "GET" })
+	.inputValidator(
+		(data: unknown) =>
+			data as {
+				code?: string;
+				token_hash?: string;
+				type?: string;
+				next?: string;
 			},
-		},
-	},
+	)
+	.handler(async ({ data }) => {
+		const supabase = createSupabaseServerClient(getRequest());
+
+		if (data.token_hash && data.type) {
+			const { data: authData, error } = await supabase.auth.verifyOtp({
+				token_hash: data.token_hash,
+				type: data.type as EmailOtpType,
+			});
+			if (error) {
+				return { success: false, error: error.message };
+			}
+			return {
+				success: true,
+				access_token: authData.session?.access_token,
+				refresh_token: authData.session?.refresh_token,
+				next: data.next || "/admin",
+			};
+		}
+
+		if (data.code) {
+			const { data: authData, error } =
+				await supabase.auth.exchangeCodeForSession(data.code);
+			if (error) {
+				return { success: false, error: error.message };
+			}
+			return {
+				success: true,
+				access_token: authData.session?.access_token,
+				refresh_token: authData.session?.refresh_token,
+				next: data.next || "/admin",
+			};
+		}
+
+		return {
+			success: false,
+			error: "No code or token provided for authentication.",
+		};
+	});
+
+export const Route = createFileRoute("/auth/callback")({
 	component: AuthCallbackComponent,
 });
 
 function AuthCallbackComponent() {
-	const router = useRouter();
+	const navigate = useNavigate();
 	const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-	// Fallback UI in case loader somehow doesn't redirect or runs on client
-	// usually shouldn't happen if `beforeLoad`/`loader` works as expected on the server
 	useEffect(() => {
-		setErrorMsg("No code or token provided for authentication.");
-		const timeout = setTimeout(() => {
-			router.navigate({
-				to: "/admin/login",
-				search: { error: "No code or token provided for authentication." },
+		const params = new URLSearchParams(window.location.search);
+		const code = params.get("code") ?? undefined;
+		const token_hash = params.get("token_hash") ?? undefined;
+		const type = params.get("type") ?? undefined;
+		const next = params.get("next") ?? "/admin";
+
+		exchangeAuthCode({ data: { code, token_hash, type, next } })
+			.then(async (res) => {
+				if (res.success && res.access_token && res.refresh_token) {
+					// Use setSession() so cookies are written in the correct
+					// sb-<project-ref>-auth-token format that the server client reads.
+					const supabase = createSupabaseBrowserClient();
+					await supabase.auth.setSession({
+						access_token: res.access_token,
+						refresh_token: res.refresh_token,
+					});
+					navigate({ to: res.next ?? "/admin" });
+				} else {
+					setErrorMsg(res.error ?? "Authentication failed.");
+					setTimeout(() => navigate({ to: "/admin/login" }), 3000);
+				}
+			})
+			.catch((e: Error) => {
+				setErrorMsg(e.message || "Authentication failed.");
+				setTimeout(() => navigate({ to: "/admin/login" }), 3000);
 			});
-		}, 3000);
-		return () => clearTimeout(timeout);
-	}, [router]);
+	}, [navigate]);
 
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-[color:var(--color-eggshell)] p-4">

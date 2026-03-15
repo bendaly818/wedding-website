@@ -143,9 +143,6 @@ function AdminDashboard() {
 	};
 
 	const handleLogout = async () => {
-		// We can just clear the cookies on the client side for simplicity,
-		// but the most robust way is to make an API call to signout.
-		// Assuming the session cookies will be discarded.
 		document.cookie =
 			"sb-access-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 		document.cookie =
