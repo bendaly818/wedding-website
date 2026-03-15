@@ -1,0 +1,632 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+"""A high precision floating point value represented as a string"""
+scalar BigFloat
+
+"""
+Boolean expression comparing fields on type "BigFloat"
+"""
+input BigFloatFilter {
+  eq: BigFloat
+  gt: BigFloat
+  gte: BigFloat
+  in: [BigFloat!]
+  is: FilterIs
+  lt: BigFloat
+  lte: BigFloat
+  neq: BigFloat
+}
+
+"""
+Boolean expression comparing fields on type "BigFloatList"
+"""
+input BigFloatListFilter {
+  containedBy: [BigFloat!]
+  contains: [BigFloat!]
+  eq: [BigFloat!]
+  is: FilterIs
+  overlaps: [BigFloat!]
+}
+
+"""An arbitrary size integer represented as a string"""
+scalar BigInt
+
+"""
+Boolean expression comparing fields on type "BigInt"
+"""
+input BigIntFilter {
+  eq: BigInt
+  gt: BigInt
+  gte: BigInt
+  in: [BigInt!]
+  is: FilterIs
+  lt: BigInt
+  lte: BigInt
+  neq: BigInt
+}
+
+"""
+Boolean expression comparing fields on type "BigIntList"
+"""
+input BigIntListFilter {
+  containedBy: [BigInt!]
+  contains: [BigInt!]
+  eq: [BigInt!]
+  is: FilterIs
+  overlaps: [BigInt!]
+}
+
+"""
+Boolean expression comparing fields on type "Boolean"
+"""
+input BooleanFilter {
+  eq: Boolean
+  is: FilterIs
+}
+
+"""
+Boolean expression comparing fields on type "BooleanList"
+"""
+input BooleanListFilter {
+  containedBy: [Boolean!]
+  contains: [Boolean!]
+  eq: [Boolean!]
+  is: FilterIs
+  overlaps: [Boolean!]
+}
+
+"""
+An opaque string using for tracking a position in results during pagination
+"""
+scalar Cursor
+
+"""A date without time information"""
+scalar Date
+
+"""
+Boolean expression comparing fields on type "Date"
+"""
+input DateFilter {
+  eq: Date
+  gt: Date
+  gte: Date
+  in: [Date!]
+  is: FilterIs
+  lt: Date
+  lte: Date
+  neq: Date
+}
+
+"""
+Boolean expression comparing fields on type "DateList"
+"""
+input DateListFilter {
+  containedBy: [Date!]
+  contains: [Date!]
+  eq: [Date!]
+  is: FilterIs
+  overlaps: [Date!]
+}
+
+"""A date and time"""
+scalar Datetime
+
+"""
+Boolean expression comparing fields on type "Datetime"
+"""
+input DatetimeFilter {
+  eq: Datetime
+  gt: Datetime
+  gte: Datetime
+  in: [Datetime!]
+  is: FilterIs
+  lt: Datetime
+  lte: Datetime
+  neq: Datetime
+}
+
+"""
+Boolean expression comparing fields on type "DatetimeList"
+"""
+input DatetimeListFilter {
+  containedBy: [Datetime!]
+  contains: [Datetime!]
+  eq: [Datetime!]
+  is: FilterIs
+  overlaps: [Datetime!]
+}
+
+enum FilterIs {
+  NOT_NULL
+  NULL
+}
+
+"""
+Boolean expression comparing fields on type "Float"
+"""
+input FloatFilter {
+  eq: Float
+  gt: Float
+  gte: Float
+  in: [Float!]
+  is: FilterIs
+  lt: Float
+  lte: Float
+  neq: Float
+}
+
+"""
+Boolean expression comparing fields on type "FloatList"
+"""
+input FloatListFilter {
+  containedBy: [Float!]
+  contains: [Float!]
+  eq: [Float!]
+  is: FilterIs
+  overlaps: [Float!]
+}
+
+"""
+Boolean expression comparing fields on type "ID"
+"""
+input IDFilter {
+  eq: ID
+}
+
+"""
+Boolean expression comparing fields on type "Int"
+"""
+input IntFilter {
+  eq: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  is: FilterIs
+  lt: Int
+  lte: Int
+  neq: Int
+}
+
+"""
+Boolean expression comparing fields on type "IntList"
+"""
+input IntListFilter {
+  containedBy: [Int!]
+  contains: [Int!]
+  eq: [Int!]
+  is: FilterIs
+  overlaps: [Int!]
+}
+
+"""A Javascript Object Notation value serialized as a string"""
+scalar JSON
+
+"""The root type for creating and mutating data"""
+type Mutation {
+  """Deletes zero or more records from the `invite` collection"""
+  deleteFrominviteCollection(
+    """
+    The maximum number of records in the collection permitted to be affected
+    """
+    atMost: Int! = 1
+    """Restricts the mutation's impact to records matching the criteria"""
+    filter: inviteFilter
+  ): inviteDeleteResponse!
+  """Deletes zero or more records from the `rsvp` collection"""
+  deleteFromrsvpCollection(
+    """
+    The maximum number of records in the collection permitted to be affected
+    """
+    atMost: Int! = 1
+    """Restricts the mutation's impact to records matching the criteria"""
+    filter: rsvpFilter
+  ): rsvpDeleteResponse!
+  """Adds one or more `invite` records to the collection"""
+  insertIntoinviteCollection(objects: [inviteInsertInput!]!): inviteInsertResponse
+  """Adds one or more `rsvp` records to the collection"""
+  insertIntorsvpCollection(objects: [rsvpInsertInput!]!): rsvpInsertResponse
+  """Updates zero or more records in the `invite` collection"""
+  updateinviteCollection(
+    """
+    The maximum number of records in the collection permitted to be affected
+    """
+    atMost: Int! = 1
+    """Restricts the mutation's impact to records matching the criteria"""
+    filter: inviteFilter
+    """
+    Fields that are set will be updated for all records matching the `filter`
+    """
+    set: inviteUpdateInput!
+  ): inviteUpdateResponse!
+  """Updates zero or more records in the `rsvp` collection"""
+  updatersvpCollection(
+    """
+    The maximum number of records in the collection permitted to be affected
+    """
+    atMost: Int! = 1
+    """Restricts the mutation's impact to records matching the criteria"""
+    filter: rsvpFilter
+    """
+    Fields that are set will be updated for all records matching the `filter`
+    """
+    set: rsvpUpdateInput!
+  ): rsvpUpdateResponse!
+}
+
+interface Node {
+  """Retrieves a record by `ID`"""
+  nodeId: ID!
+}
+
+"""Any type not handled by the type system"""
+scalar Opaque
+
+"""
+Boolean expression comparing fields on type "Opaque"
+"""
+input OpaqueFilter {
+  eq: Opaque
+  is: FilterIs
+}
+
+"""Defines a per-field sorting order"""
+enum OrderByDirection {
+  """Ascending order, nulls first"""
+  AscNullsFirst
+  """Ascending order, nulls last"""
+  AscNullsLast
+  """Descending order, nulls first"""
+  DescNullsFirst
+  """Descending order, nulls last"""
+  DescNullsLast
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+}
+
+"""The root type for querying data"""
+type Query {
+  """A pagable collection of type `invite`"""
+  inviteCollection(
+    """Query values in the collection after the provided cursor"""
+    after: Cursor
+    """Query values in the collection before the provided cursor"""
+    before: Cursor
+    """Filters to apply to the results set when querying from the collection"""
+    filter: inviteFilter
+    """Query the first `n` records in the collection"""
+    first: Int
+    """Query the last `n` records in the collection"""
+    last: Int
+    """
+    Skip n values from the after cursor. Alternative to cursor pagination. Backward pagination not supported.
+    """
+    offset: Int
+    """Sort order to apply to the collection"""
+    orderBy: [inviteOrderBy!]
+  ): inviteConnection
+  """Retrieve a record by its `ID`"""
+  node(
+    """The record's `ID`"""
+    nodeId: ID!
+  ): Node
+  """A pagable collection of type `rsvp`"""
+  rsvpCollection(
+    """Query values in the collection after the provided cursor"""
+    after: Cursor
+    """Query values in the collection before the provided cursor"""
+    before: Cursor
+    """Filters to apply to the results set when querying from the collection"""
+    filter: rsvpFilter
+    """Query the first `n` records in the collection"""
+    first: Int
+    """Query the last `n` records in the collection"""
+    last: Int
+    """
+    Skip n values from the after cursor. Alternative to cursor pagination. Backward pagination not supported.
+    """
+    offset: Int
+    """Sort order to apply to the collection"""
+    orderBy: [rsvpOrderBy!]
+  ): rsvpConnection
+}
+
+"""
+Boolean expression comparing fields on type "String"
+"""
+input StringFilter {
+  eq: String
+  gt: String
+  gte: String
+  ilike: String
+  in: [String!]
+  iregex: String
+  is: FilterIs
+  like: String
+  lt: String
+  lte: String
+  neq: String
+  regex: String
+  startsWith: String
+}
+
+"""
+Boolean expression comparing fields on type "StringList"
+"""
+input StringListFilter {
+  containedBy: [String!]
+  contains: [String!]
+  eq: [String!]
+  is: FilterIs
+  overlaps: [String!]
+}
+
+"""A time without date information"""
+scalar Time
+
+"""
+Boolean expression comparing fields on type "Time"
+"""
+input TimeFilter {
+  eq: Time
+  gt: Time
+  gte: Time
+  in: [Time!]
+  is: FilterIs
+  lt: Time
+  lte: Time
+  neq: Time
+}
+
+"""
+Boolean expression comparing fields on type "TimeList"
+"""
+input TimeListFilter {
+  containedBy: [Time!]
+  contains: [Time!]
+  eq: [Time!]
+  is: FilterIs
+  overlaps: [Time!]
+}
+
+"""A universally unique identifier"""
+scalar UUID
+
+"""
+Boolean expression comparing fields on type "UUID"
+"""
+input UUIDFilter {
+  eq: UUID
+  in: [UUID!]
+  is: FilterIs
+  neq: UUID
+}
+
+"""
+Boolean expression comparing fields on type "UUIDList"
+"""
+input UUIDListFilter {
+  containedBy: [UUID!]
+  contains: [UUID!]
+  eq: [UUID!]
+  is: FilterIs
+  overlaps: [UUID!]
+}
+
+type invite implements Node {
+  created_at: Datetime!
+  id: UUID!
+  message: String
+  name: String
+  """Globally Unique Record Identifier"""
+  nodeId: ID!
+  rsvp: rsvp
+  rsvpCollection(
+    """Query values in the collection after the provided cursor"""
+    after: Cursor
+    """Query values in the collection before the provided cursor"""
+    before: Cursor
+    """Filters to apply to the results set when querying from the collection"""
+    filter: rsvpFilter
+    """Query the first `n` records in the collection"""
+    first: Int
+    """Query the last `n` records in the collection"""
+    last: Int
+    """
+    Skip n values from the after cursor. Alternative to cursor pagination. Backward pagination not supported.
+    """
+    offset: Int
+    """Sort order to apply to the collection"""
+    orderBy: [rsvpOrderBy!]
+  ): rsvpConnection
+  rsvp_id: UUID
+  sent: Boolean
+}
+
+type inviteConnection {
+  edges: [inviteEdge!]!
+  pageInfo: PageInfo!
+}
+
+type inviteDeleteResponse {
+  """Count of the records impacted by the mutation"""
+  affectedCount: Int!
+  """Array of records impacted by the mutation"""
+  records: [invite!]!
+}
+
+type inviteEdge {
+  cursor: String!
+  node: invite!
+}
+
+input inviteFilter {
+  """
+  Returns true only if all its inner filters are true, otherwise returns false
+  """
+  and: [inviteFilter!]
+  created_at: DatetimeFilter
+  id: UUIDFilter
+  message: StringFilter
+  name: StringFilter
+  nodeId: IDFilter
+  """Negates a filter"""
+  not: inviteFilter
+  """
+  Returns true if at least one of its inner filters is true, otherwise returns false
+  """
+  or: [inviteFilter!]
+  rsvp_id: UUIDFilter
+  sent: BooleanFilter
+}
+
+input inviteInsertInput {
+  created_at: Datetime
+  id: UUID
+  message: String
+  name: String
+  rsvp_id: UUID
+  sent: Boolean
+}
+
+type inviteInsertResponse {
+  """Count of the records impacted by the mutation"""
+  affectedCount: Int!
+  """Array of records impacted by the mutation"""
+  records: [invite!]!
+}
+
+input inviteOrderBy {
+  created_at: OrderByDirection
+  id: OrderByDirection
+  message: OrderByDirection
+  name: OrderByDirection
+  rsvp_id: OrderByDirection
+  sent: OrderByDirection
+}
+
+input inviteUpdateInput {
+  created_at: Datetime
+  id: UUID
+  message: String
+  name: String
+  rsvp_id: UUID
+  sent: Boolean
+}
+
+type inviteUpdateResponse {
+  """Count of the records impacted by the mutation"""
+  affectedCount: Int!
+  """Array of records impacted by the mutation"""
+  records: [invite!]!
+}
+
+type rsvp implements Node {
+  attending: Boolean
+  created_at: Datetime!
+  dietary: String
+  id: UUID!
+  invite: invite
+  inviteCollection(
+    """Query values in the collection after the provided cursor"""
+    after: Cursor
+    """Query values in the collection before the provided cursor"""
+    before: Cursor
+    """Filters to apply to the results set when querying from the collection"""
+    filter: inviteFilter
+    """Query the first `n` records in the collection"""
+    first: Int
+    """Query the last `n` records in the collection"""
+    last: Int
+    """
+    Skip n values from the after cursor. Alternative to cursor pagination. Backward pagination not supported.
+    """
+    offset: Int
+    """Sort order to apply to the collection"""
+    orderBy: [inviteOrderBy!]
+  ): inviteConnection
+  invite_id: UUID
+  """Globally Unique Record Identifier"""
+  nodeId: ID!
+}
+
+type rsvpConnection {
+  edges: [rsvpEdge!]!
+  pageInfo: PageInfo!
+}
+
+type rsvpDeleteResponse {
+  """Count of the records impacted by the mutation"""
+  affectedCount: Int!
+  """Array of records impacted by the mutation"""
+  records: [rsvp!]!
+}
+
+type rsvpEdge {
+  cursor: String!
+  node: rsvp!
+}
+
+input rsvpFilter {
+  """
+  Returns true only if all its inner filters are true, otherwise returns false
+  """
+  and: [rsvpFilter!]
+  attending: BooleanFilter
+  created_at: DatetimeFilter
+  dietary: StringFilter
+  id: UUIDFilter
+  invite_id: UUIDFilter
+  nodeId: IDFilter
+  """Negates a filter"""
+  not: rsvpFilter
+  """
+  Returns true if at least one of its inner filters is true, otherwise returns false
+  """
+  or: [rsvpFilter!]
+}
+
+input rsvpInsertInput {
+  attending: Boolean
+  created_at: Datetime
+  dietary: String
+  id: UUID
+  invite_id: UUID
+}
+
+type rsvpInsertResponse {
+  """Count of the records impacted by the mutation"""
+  affectedCount: Int!
+  """Array of records impacted by the mutation"""
+  records: [rsvp!]!
+}
+
+input rsvpOrderBy {
+  attending: OrderByDirection
+  created_at: OrderByDirection
+  dietary: OrderByDirection
+  id: OrderByDirection
+  invite_id: OrderByDirection
+}
+
+input rsvpUpdateInput {
+  attending: Boolean
+  created_at: Datetime
+  dietary: String
+  id: UUID
+  invite_id: UUID
+}
+
+type rsvpUpdateResponse {
+  """Count of the records impacted by the mutation"""
+  affectedCount: Int!
+  """Array of records impacted by the mutation"""
+  records: [rsvp!]!
+}

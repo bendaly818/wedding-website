@@ -1,52 +1,64 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { gql } from "graphql-request";
+import { getRequest } from "@tanstack/react-start/server";
 import { useState } from "react";
+import { graphql } from "#/gql";
+import type { GetAllInvitesQuery } from "#/gql/graphql";
 import { createSupabaseServerClient } from "../../lib/supabase";
 import { supabaseGraphqlClient } from "../../lib/supabase-graphql";
 
+/** Returns the current user AND their access token for use in authenticated GraphQL requests. */
+async function getAuthSession() {
+	const supabase = createSupabaseServerClient(getRequest());
+	const {
+		data: { session },
+	} = await supabase.auth.getSession();
+	return session;
+}
+
 export const getAuthUser = createServerFn({ method: "GET" }).handler(
 	async () => {
-		const supabase = createSupabaseServerClient();
-		const {
-			data: { user },
-		} = await supabase.auth.getUser();
-		return user;
+		const session = await getAuthSession();
+		return session?.user ?? null;
 	},
 );
-
-const GET_ALL_INVITES = gql`
+const GET_ALL_INVITES = graphql(`
   query GetAllInvites {
-    inviteCollection(orderBy: { created_at: DescNullsLast }) {
+    inviteCollection(orderBy: [{ created_at: DescNullsLast }]) {
       edges {
         node {
           id
           name
           message
           sent
-          rsvpCollection {
-            edges {
-              node {
-                attending
-                dietary
-              }
-            }
-          }
+		  rsvpCollection {
+			edges {
+				node {
+					id
+					attending
+					dietary
+				}
+			}
+		  }
         }
       }
     }
   }
-`;
+`);
 
 export const getAllInvites = createServerFn({ method: "GET" }).handler(
 	async () => {
-		// We check auth here too, to secure the function
-		const user = await getAuthUser();
-		if (!user) throw new Error("Unauthorized");
+		const session = await getAuthSession();
+		if (!session) throw new Error("Unauthorized");
 
 		try {
-			const res: any = await supabaseGraphqlClient.request(GET_ALL_INVITES);
-			return res.inviteCollection?.edges?.map((e: any) => e.node) || [];
+			const res = await supabaseGraphqlClient.request<GetAllInvitesQuery>(
+				GET_ALL_INVITES,
+				{},
+				{ Authorization: `Bearer ${session.access_token}` },
+			);
+			return res.inviteCollection?.edges?.map((e) => e.node) || [];
 		} catch (e) {
 			console.error(e);
 			return [];
@@ -54,7 +66,7 @@ export const getAllInvites = createServerFn({ method: "GET" }).handler(
 	},
 );
 
-const ADD_INVITE_MUTATION = gql`
+const ADD_INVITE_MUTATION = graphql(`
   mutation AddInvite($name: String!, $message: String, $sent: Boolean) {
     insertIntoinviteCollection(objects: [
       {
@@ -68,22 +80,22 @@ const ADD_INVITE_MUTATION = gql`
       }
     }
   }
-`;
+`);
 
 export const addInvite = createServerFn({ method: "POST" })
 	.inputValidator(
 		(data: unknown) => data as { name: string; message: string; sent: boolean },
 	)
 	.handler(async ({ data }) => {
-		const user = await getAuthUser();
-		if (!user) throw new Error("Unauthorized");
+		const session = await getAuthSession();
+		if (!session) throw new Error("Unauthorized");
 
 		try {
-			await supabaseGraphqlClient.request(ADD_INVITE_MUTATION, {
-				name: data.name,
-				message: data.message,
-				sent: data.sent,
-			});
+			await supabaseGraphqlClient.request(
+				ADD_INVITE_MUTATION,
+				{ name: data.name, message: data.message, sent: data.sent },
+				{ Authorization: `Bearer ${session.access_token}` },
+			);
 			return { success: true };
 		} catch (e) {
 			console.error(e);
@@ -100,25 +112,34 @@ export const Route = createFileRoute("/admin/")({
 			});
 		}
 	},
-	loader: async () => {
-		const invites = await getAllInvites();
-		return { invites };
-	},
 	component: AdminDashboard,
 });
 
 function AdminDashboard() {
-	const { invites } = Route.useLoaderData();
-	const [isAdding, setIsAdding] = useState(false);
+	const queryClient = useQueryClient();
 	const [name, setName] = useState("");
 	const [message, setMessage] = useState("");
 	const [sent, setSent] = useState(false);
 
-	const handleCreate = async (e: React.FormEvent) => {
+	const { data: invites = [] } = useQuery({
+		queryKey: ["invites"],
+		queryFn: () => getAllInvites(),
+	});
+
+	const createInvite = useMutation({
+		mutationFn: (data: { name: string; message: string; sent: boolean }) =>
+			addInvite({ data }),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["invites"] });
+			setName("");
+			setMessage("");
+			setSent(false);
+		},
+	});
+
+	const handleCreate = (e: React.FormEvent) => {
 		e.preventDefault();
-		setIsAdding(true);
-		await addInvite({ data: { name, message, sent } });
-		window.location.reload();
+		createInvite.mutate({ name, message, sent });
 	};
 
 	const handleLogout = async () => {
@@ -141,6 +162,7 @@ function AdminDashboard() {
 					</h1>
 					<button
 						onClick={handleLogout}
+						type="button"
 						className="bg-white px-4 py-2 rounded-lg border border-[color:var(--color-plum)]/20 shadow-sm text-sm font-bold tracking-widest uppercase hover:bg-gray-50 transition-colors cursor-pointer"
 					>
 						Logout
@@ -189,11 +211,11 @@ function AdminDashboard() {
 							</span>
 						</label>
 						<button
-							disabled={isAdding}
+							disabled={createInvite.isPending}
 							type="submit"
 							className="bg-[color:var(--color-burnt-orange)] text-white font-bold p-3 rounded-lg hover:opacity-90 uppercase tracking-widest transition-opacity w-fit px-8 cursor-pointer disabled:opacity-50"
 						>
-							{isAdding ? "Creating..." : "Create Invite"}
+							{createInvite.isPending ? "Creating..." : "Create Invite"}
 						</button>
 					</form>
 				</section>
@@ -219,7 +241,7 @@ function AdminDashboard() {
 								</tr>
 							</thead>
 							<tbody>
-								{invites?.map((invite: any) => {
+								{invites?.map((invite) => {
 									const rsvp = invite.rsvpCollection?.edges?.[0]?.node;
 									return (
 										<tr
@@ -247,7 +269,7 @@ function AdminDashboard() {
 											</td>
 											<td className="py-4 border-l pl-4 font-medium uppercase text-xs">
 												{rsvp ? (
-													rsvp.attending === "yes" ? (
+													rsvp.attending ? (
 														<span className="text-green-600 font-bold">
 															Attending
 														</span>

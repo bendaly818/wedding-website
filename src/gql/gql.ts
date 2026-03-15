@@ -1,0 +1,64 @@
+/* eslint-disable */
+import * as types from './graphql';
+import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
+
+/**
+ * Map of all GraphQL operations in the project.
+ *
+ * This map has several performance disadvantages:
+ * 1. It is not tree-shakeable, so it will include all operations in the project.
+ * 2. It is not minifiable, so the string of a GraphQL query will be multiple times inside the bundle.
+ * 3. It does not support dead code elimination, so it will add unused operations.
+ *
+ * Therefore it is highly recommended to use the babel or swc plugin for production.
+ * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
+ */
+type Documents = {
+    "\n  query GetAllInvites {\n    inviteCollection(orderBy: [{ created_at: DescNullsLast }]) {\n      edges {\n        node {\n          id\n          name\n          message\n          sent\n\t\t  rsvpCollection {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\tid\n\t\t\t\t\tattending\n\t\t\t\t\tdietary\n\t\t\t\t}\n\t\t\t}\n\t\t  }\n        }\n      }\n    }\n  }\n": typeof types.GetAllInvitesDocument,
+    "\n  mutation AddInvite($name: String!, $message: String, $sent: Boolean) {\n    insertIntoinviteCollection(objects: [\n      {\n        name: $name,\n        message: $message,\n        sent: $sent\n      }\n    ]) {\n      records {\n        id\n      }\n    }\n  }\n": typeof types.AddInviteDocument,
+    "\n  query GetInviteDetail($id: UUID!) {\n    inviteCollection(filter: { id: { eq: $id } }, first: 1) {\n      edges {\n        node {\n          id\n          name\n        }\n      }\n    }\n  }\n": typeof types.GetInviteDetailDocument,
+    "\n  mutation InsertRsvp($invite_id: UUID!, $attending: Boolean!, $dietary: String) {\n    insertIntorsvpCollection(objects: [\n      {\n        invite_id: $invite_id,\n        attending: $attending,\n        dietary: $dietary\n      }\n    ]) {\n      records {\n        id\n      }\n    }\n  }\n": typeof types.InsertRsvpDocument,
+};
+const documents: Documents = {
+    "\n  query GetAllInvites {\n    inviteCollection(orderBy: [{ created_at: DescNullsLast }]) {\n      edges {\n        node {\n          id\n          name\n          message\n          sent\n\t\t  rsvpCollection {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\tid\n\t\t\t\t\tattending\n\t\t\t\t\tdietary\n\t\t\t\t}\n\t\t\t}\n\t\t  }\n        }\n      }\n    }\n  }\n": types.GetAllInvitesDocument,
+    "\n  mutation AddInvite($name: String!, $message: String, $sent: Boolean) {\n    insertIntoinviteCollection(objects: [\n      {\n        name: $name,\n        message: $message,\n        sent: $sent\n      }\n    ]) {\n      records {\n        id\n      }\n    }\n  }\n": types.AddInviteDocument,
+    "\n  query GetInviteDetail($id: UUID!) {\n    inviteCollection(filter: { id: { eq: $id } }, first: 1) {\n      edges {\n        node {\n          id\n          name\n        }\n      }\n    }\n  }\n": types.GetInviteDetailDocument,
+    "\n  mutation InsertRsvp($invite_id: UUID!, $attending: Boolean!, $dietary: String) {\n    insertIntorsvpCollection(objects: [\n      {\n        invite_id: $invite_id,\n        attending: $attending,\n        dietary: $dietary\n      }\n    ]) {\n      records {\n        id\n      }\n    }\n  }\n": types.InsertRsvpDocument,
+};
+
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ *
+ *
+ * @example
+ * ```ts
+ * const query = graphql(`query GetUser($id: ID!) { user(id: $id) { name } }`);
+ * ```
+ *
+ * The query argument is unknown!
+ * Please regenerate the types.
+ */
+export function graphql(source: string): unknown;
+
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query GetAllInvites {\n    inviteCollection(orderBy: [{ created_at: DescNullsLast }]) {\n      edges {\n        node {\n          id\n          name\n          message\n          sent\n\t\t  rsvpCollection {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\tid\n\t\t\t\t\tattending\n\t\t\t\t\tdietary\n\t\t\t\t}\n\t\t\t}\n\t\t  }\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetAllInvites {\n    inviteCollection(orderBy: [{ created_at: DescNullsLast }]) {\n      edges {\n        node {\n          id\n          name\n          message\n          sent\n\t\t  rsvpCollection {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\tid\n\t\t\t\t\tattending\n\t\t\t\t\tdietary\n\t\t\t\t}\n\t\t\t}\n\t\t  }\n        }\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation AddInvite($name: String!, $message: String, $sent: Boolean) {\n    insertIntoinviteCollection(objects: [\n      {\n        name: $name,\n        message: $message,\n        sent: $sent\n      }\n    ]) {\n      records {\n        id\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation AddInvite($name: String!, $message: String, $sent: Boolean) {\n    insertIntoinviteCollection(objects: [\n      {\n        name: $name,\n        message: $message,\n        sent: $sent\n      }\n    ]) {\n      records {\n        id\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query GetInviteDetail($id: UUID!) {\n    inviteCollection(filter: { id: { eq: $id } }, first: 1) {\n      edges {\n        node {\n          id\n          name\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetInviteDetail($id: UUID!) {\n    inviteCollection(filter: { id: { eq: $id } }, first: 1) {\n      edges {\n        node {\n          id\n          name\n        }\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation InsertRsvp($invite_id: UUID!, $attending: Boolean!, $dietary: String) {\n    insertIntorsvpCollection(objects: [\n      {\n        invite_id: $invite_id,\n        attending: $attending,\n        dietary: $dietary\n      }\n    ]) {\n      records {\n        id\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation InsertRsvp($invite_id: UUID!, $attending: Boolean!, $dietary: String) {\n    insertIntorsvpCollection(objects: [\n      {\n        invite_id: $invite_id,\n        attending: $attending,\n        dietary: $dietary\n      }\n    ]) {\n      records {\n        id\n      }\n    }\n  }\n"];
+
+export function graphql(source: string) {
+  return (documents as any)[source] ?? {};
+}
+
+export type DocumentType<TDocumentNode extends DocumentNode<any, any>> = TDocumentNode extends DocumentNode<  infer TType,  any>  ? TType  : never;

@@ -3,14 +3,14 @@ import { gql } from "graphql-request";
 import { supabaseGraphqlClient } from "../../lib/supabase-graphql";
 
 type RsvpInput = {
-  invite_id: string; // Changed from name to invite_id
-  attending: string;
-  dietary?: string;
+	invite_id: string; // Changed from name to invite_id
+	attending: string;
+	dietary?: string;
 };
 
 // Assuming an rsvps table with a foreign key to invites
 const INSERT_RSVP_MUTATION = gql`
-  mutation InsertRsvp($invite_id: UUID!, $attending: String!, $dietary: String) {
+  mutation InsertRsvp($invite_id: UUID!, $attending: Boolean!, $dietary: String) {
     insertIntorsvpCollection(objects: [
       {
         invite_id: $invite_id,

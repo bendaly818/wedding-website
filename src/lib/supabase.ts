@@ -1,24 +1,42 @@
-import { createServerClient } from "@supabase/ssr";
-import { getCookie, setCookie } from "vinxi/http";
+import {
+	createBrowserClient,
+	createServerClient,
+	parseCookieHeader,
+	serializeCookieHeader,
+} from "@supabase/ssr";
 
-export function createSupabaseServerClient() {
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
+const VITE_SUPABASE_PUBLISHABLE_KEY = import.meta.env
+	.VITE_SUPABASE_PUBLISHABLE_KEY as string;
+
+// Browser client: stores PKCE code verifier in cookies automatically.
+// Use this for any auth flows initiated in the browser (e.g. OAuth, password reset).
+export function createSupabaseBrowserClient() {
+	return createBrowserClient(SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY);
+}
+
+export function createSupabaseServerClient(request: Request) {
+	const headers = new Headers();
 	return createServerClient(
 		process.env.SUPABASE_URL!,
-		process.env.SUPABASE_ANON_KEY!,
+		process.env.SUPABASE_SECRET_KEY!,
 		{
 			cookies: {
 				getAll() {
-					// Minimal implementation, getCookie inside Server Functions doesn't let us iterate all
-					return [];
+					return parseCookieHeader(request.headers.get("Cookie") ?? "").map(
+						(cookie) => ({
+							name: cookie.name,
+							value: cookie.value ?? "",
+						}),
+					);
 				},
 				setAll(cookiesToSet) {
-					try {
-						cookiesToSet.forEach(({ name, value, options }) => {
-							setCookie(name, value, options);
-						});
-					} catch (e) {
-						// Ignored for Server Components
-					}
+					cookiesToSet.forEach(({ name, value }) => {
+						headers.append(
+							"Set-Cookie",
+							serializeCookieHeader(name, value, {}),
+						);
+					});
 				},
 			},
 		},
