@@ -1,3 +1,4 @@
+import { env } from "cloudflare:workers";
 import {
 	createBrowserClient,
 	createServerClient,
@@ -17,28 +18,21 @@ export function createSupabaseBrowserClient() {
 
 export function createSupabaseServerClient(request: Request) {
 	const headers = new Headers();
-	return createServerClient(
-		process.env.SUPABASE_URL!,
-		process.env.SUPABASE_SECRET_KEY!,
-		{
-			cookies: {
-				getAll() {
-					return parseCookieHeader(request.headers.get("Cookie") ?? "").map(
-						(cookie) => ({
-							name: cookie.name,
-							value: cookie.value ?? "",
-						}),
-					);
-				},
-				setAll(cookiesToSet) {
-					cookiesToSet.forEach(({ name, value }) => {
-						headers.append(
-							"Set-Cookie",
-							serializeCookieHeader(name, value, {}),
-						);
-					});
-				},
+	return createServerClient(env.SUPABASE_URL, env.SUPABASE_SECRET_KEY, {
+		cookies: {
+			getAll() {
+				return parseCookieHeader(request.headers.get("Cookie") ?? "").map(
+					(cookie) => ({
+						name: cookie.name,
+						value: cookie.value ?? "",
+					}),
+				);
+			},
+			setAll(cookiesToSet) {
+				cookiesToSet.forEach(({ name, value }) => {
+					headers.append("Set-Cookie", serializeCookieHeader(name, value, {}));
+				});
 			},
 		},
-	);
+	});
 }
