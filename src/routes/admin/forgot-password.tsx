@@ -9,7 +9,7 @@ export const sendPasswordResetEmail = createServerFn({ method: "POST" })
 		(data: unknown) => data as { email: string; redirectTo: string },
 	)
 	.handler(async ({ data }) => {
-		const supabase = createSupabaseServerClient(getRequest());
+		const supabase = await createSupabaseServerClient(getRequest());
 		const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
 			redirectTo: data.redirectTo,
 		});

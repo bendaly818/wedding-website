@@ -10,7 +10,7 @@ import { supabaseGraphqlClient } from "../../lib/supabase-graphql";
 
 /** Returns the current user AND their access token for use in authenticated GraphQL requests. */
 async function getAuthSession() {
-	const supabase = createSupabaseServerClient(getRequest());
+	const supabase = await createSupabaseServerClient(getRequest());
 	const {
 		data: { session },
 	} = await supabase.auth.getSession();

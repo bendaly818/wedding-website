@@ -8,7 +8,7 @@ export const updatePasswordFn = createServerFn({ method: "POST" })
 	.inputValidator((data: unknown) => data as { password?: string })
 	.handler(async ({ data }) => {
 		try {
-			const supabase = createSupabaseServerClient(getRequest());
+			const supabase = await createSupabaseServerClient(getRequest());
 			// Ensure the user is authenticated since updateUser updates the currently logged in user
 			const { error } = await supabase.auth.updateUser({
 				password: data.password || "",

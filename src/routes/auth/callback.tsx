@@ -17,7 +17,7 @@ const exchangeAuthCode = createServerFn({ method: "GET" })
 			},
 	)
 	.handler(async ({ data }) => {
-		const supabase = createSupabaseServerClient(getRequest());
+		const supabase = await createSupabaseServerClient(getRequest());
 
 		if (data.token_hash && data.type) {
 			const { data: authData, error } = await supabase.auth.verifyOtp({

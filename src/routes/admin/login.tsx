@@ -11,7 +11,7 @@ export const loginWithPasswordFn = createServerFn({ method: "POST" })
 	)
 	.handler(async ({ data }) => {
 		try {
-			const supabase = createSupabaseServerClient(getRequest());
+			const supabase = await createSupabaseServerClient(getRequest());
 			const { error, data: authData } = await supabase.auth.signInWithPassword({
 				email: data.email || "",
 				password: data.password || "",
@@ -39,7 +39,7 @@ export const loginWithMagicLinkFn = createServerFn({ method: "POST" })
 	)
 	.handler(async ({ data }) => {
 		try {
-			const supabase = createSupabaseServerClient(getRequest());
+			const supabase = await createSupabaseServerClient(getRequest());
 			const { error } = await supabase.auth.signInWithOtp({
 				email: data.email || "",
 				options: {

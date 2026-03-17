@@ -5,9 +5,9 @@ import {
 	serializeCookieHeader,
 } from "@supabase/ssr";
 
-export function createSupabaseServerClient(request: Request) {
+export async function createSupabaseServerClient(request: Request) {
 	const headers = new Headers();
-	return createServerClient(env.SUPABASE_URL, env.SUPABASE_SECRET_KEY, {
+	return createServerClient(env.SUPABASE_URL, await env.SUPABASE_SECRET_KEY.get(), {
 		cookies: {
 			getAll() {
 				return parseCookieHeader(request.headers.get("Cookie") ?? "").map(
