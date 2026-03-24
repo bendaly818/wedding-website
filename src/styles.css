@@ -3,41 +3,95 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --color-plum: #5c203b;
-  --color-plum-light: #7a2f52;
-  --color-plum-dark: #3a1223;
-  --color-burnt-orange: #d15c17;
-  --color-burnt-orange-light: #e57535;
-  --color-eggshell: #f4f1ea;
+  /* Moodboard palette: Wine · Pistachio · Plum Pink · Blush · White */
+  --color-wine: #6b1535;
+  --color-wine-dark: #4a0e24;
+  --color-pistachio: #a8b55a;
+  --color-pistachio-dark: #8a9648;
+  --color-plum-pink: #d04878;
+  --color-blush: #e8cfc0;        /* warm sand — used sparingly as accent only */
+  --color-blush-light: #f5f0eb;  /* clean off-white base */
   --color-white: #ffffff;
-  
+
   --font-sans: "Lato", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-serif: "Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
 :root {
-  --bg-color: var(--color-eggshell);
-  --text-color: var(--color-plum-dark);
-  --header-bg: rgba(244, 241, 234, 0.85);
-  --nav-link-color: var(--color-plum);
-  --nav-link-hover: var(--color-burnt-orange);
+  --bg-color: var(--color-blush-light);
+  --text-color: var(--color-wine-dark);
+  --header-bg: rgba(245, 240, 235, 0.94);
+  --nav-link-color: var(--color-wine);
+  --nav-link-hover: var(--color-wine);
+
+  /* Section backgrounds — unified off-white, barely stepped */
+  --section-s1: #f5f0eb;
+  --section-s2: #f0ebe4;
+  --section-s3: #ebe4db;
+
+  /* Adaptive text / heading tokens */
+  --heading-on-bg: var(--color-wine);
+  --outline-btn-color: var(--color-wine);
+
+  /* Card surface */
+  --card-bg: #ffffff;
+  --card-border: #ddd4c8;        /* neutral warm border, not pink */
+  --card-heading: var(--color-wine);
+  --card-text: var(--color-wine);
+
+  /* Pistachio accent */
+  --accent-green: var(--color-pistachio);
+  --accent-green-text: #5e6e2a;   /* darker for legibility on light bg */
 }
 
 :root[data-theme="dark"] {
-  --bg-color: var(--color-plum-dark);
-  --text-color: var(--color-eggshell);
-  --header-bg: rgba(58, 18, 35, 0.85);
-  --nav-link-color: var(--color-eggshell);
-  --nav-link-hover: var(--color-burnt-orange-light);
+  --bg-color: var(--color-wine-dark);
+  --text-color: var(--color-blush-light);
+  --header-bg: rgba(74, 14, 36, 0.92);
+  --nav-link-color: #e8d8c8;
+  --nav-link-hover: #e8d8c8;
+
+  /* Section backgrounds — same dark wine base, subtle steps */
+  --section-s1: #3d0d22;
+  --section-s2: #461228;
+  --section-s3: #50182f;
+
+  /* Adaptive flips */
+  --heading-on-bg: #e8d8c8;
+  --outline-btn-color: #e8d8c8;
+
+  --card-bg: #3a0920;
+  --card-border: #5a2a3a;
+  --card-heading: #e8d8c8;
+  --card-text: var(--color-blush-light);
+
+  /* Pistachio reads fine on dark wine */
+  --accent-green: var(--color-pistachio);
+  --accent-green-text: var(--color-pistachio);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg-color: var(--color-plum-dark);
-    --text-color: var(--color-eggshell);
-    --header-bg: rgba(58, 18, 35, 0.85);
-    --nav-link-color: var(--color-eggshell);
-    --nav-link-hover: var(--color-burnt-orange-light);
+    --bg-color: var(--color-wine-dark);
+    --text-color: var(--color-blush-light);
+    --header-bg: rgba(74, 14, 36, 0.92);
+    --nav-link-color: #e8d8c8;
+    --nav-link-hover: #e8d8c8;
+
+    --section-s1: #3d0d22;
+    --section-s2: #461228;
+    --section-s3: #50182f;
+
+    --heading-on-bg: #e8d8c8;
+    --outline-btn-color: #e8d8c8;
+
+    --card-bg: #3a0920;
+    --card-border: #5a2a3a;
+    --card-heading: #e8d8c8;
+    --card-text: var(--color-blush-light);
+
+    --accent-green: var(--color-pistachio);
+    --accent-green-text: var(--color-pistachio);
   }
 }
 
@@ -102,4 +156,160 @@ h1, h2, h3, h4, h5, h6, .display-title {
 .nav-link:hover::after,
 .nav-link.is-active::after {
   transform: scaleX(1);
+}
+
+/* ──────────────────────────────────────────────────
+   Full-screen overlays (coming-soon, loading, envelope)
+   ────────────────────────────────────────────────── */
+
+.fullscreen-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+/* ── Envelope scene ─────────────────────────────── */
+
+.envelope-scene {
+  gap: 2.5rem;
+  background: radial-gradient(ellipse at 50% 35%, #5c1529 0%, #1e0810 100%);
+  transition: opacity 0.8s ease;
+  cursor: default;
+}
+
+.envelope-scene.is-exiting {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes envelope-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+
+.envelope-outer {
+  position: relative;
+  width: min(400px, 90vw);
+  animation: envelope-float 4s ease-in-out infinite;
+}
+
+.envelope-outer.is-animating {
+  animation: none;
+}
+
+/* Envelope body */
+.envelope-body {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.6;
+  background: var(--color-blush-light);
+  border-radius: 3px;
+  box-shadow:
+    0 40px 80px rgba(0, 0, 0, 0.65),
+    0 8px 24px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 1.25rem;
+}
+
+/* Diagonal V-fold lines */
+.envelope-body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to bottom right,
+      transparent calc(50% - 0.6px),
+      rgba(107, 21, 53, 0.18) calc(50% - 0.6px),
+      rgba(107, 21, 53, 0.18) calc(50% + 0.6px),
+      transparent calc(50% + 0.6px)
+    ),
+    linear-gradient(
+      to bottom left,
+      transparent calc(50% - 0.6px),
+      rgba(107, 21, 53, 0.18) calc(50% - 0.6px),
+      rgba(107, 21, 53, 0.18) calc(50% + 0.6px),
+      transparent calc(50% + 0.6px)
+    );
+  pointer-events: none;
+  border-radius: 3px;
+}
+
+/* Triangular flap */
+.envelope-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 62%;
+  clip-path: polygon(0 0, 100% 0, 50% 80%);
+  background: linear-gradient(160deg, #7d1b42, var(--color-wine) 65%);
+  transform-origin: top center;
+  transform: perspective(800px) rotateX(0deg);
+  transition: transform 0.75s cubic-bezier(0.4, 0, 0.2, 1);
+  backface-visibility: hidden;
+  z-index: 3;
+}
+
+.envelope-flap.is-open {
+  transform: perspective(800px) rotateX(-180deg);
+}
+
+/* Wax seal — positioned at the triangle tip (52% height × 80% clip = 41.6%) */
+.envelope-seal {
+  position: absolute;
+  top: calc(49.6% - 27px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, var(--color-plum-pink), #7a1030 72%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-blush-light);
+  font-family: var(--font-serif);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  box-shadow:
+    0 3px 16px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  z-index: 4;
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+.envelope-seal.is-broken {
+  transform: translateX(-50%) scale(0.5);
+  opacity: 0;
+}
+
+/* CTA button */
+.envelope-cta {
+  padding: 0.75rem 2.5rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: var(--color-plum-pink);
+  color: var(--color-white);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 24px rgba(208, 72, 120, 0.45);
+}
+
+.envelope-cta:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 32px rgba(208, 72, 120, 0.65);
 }

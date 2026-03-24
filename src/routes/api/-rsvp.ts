@@ -1,46 +1,95 @@
-import { createServerFn } from "@tanstack/react-start";
-import { gql } from "graphql-request";
-import { supabaseGraphqlClient } from "../../lib/supabase-graphql";
+import { supabaseGraphqlClient } from "#/lib/supabase-graphql";
+import { graphql } from "#/gql";
 
 type RsvpInput = {
-	invite_id: string; // Changed from name to invite_id
+	invite_id: string;
 	attending: string;
 	dietary?: string;
 };
 
-// Assuming an rsvps table with a foreign key to invites
-const INSERT_RSVP_MUTATION = gql`
-  mutation InsertRsvp($invite_id: UUID!, $attending: Boolean!, $dietary: String) {
-    insertIntorsvpCollection(objects: [
-      {
-        invite_id: $invite_id,
-        attending: $attending,
-        dietary: $dietary
-      }
-    ]) {
-      records {
-        id
-      }
-    }
-  }
-`;
-
-export const submitRsvp = createServerFn({ method: "POST" })
-	.inputValidator((data: unknown): RsvpInput => {
-		return data as RsvpInput;
-	})
-	.handler(async ({ data }) => {
-		try {
-			// Execute the Supabase GraphQL mutation
-			await supabaseGraphqlClient.request(INSERT_RSVP_MUTATION, {
-				invite_id: data.invite_id,
-				attending: data.attending,
-				dietary: data.dietary,
-			});
-
-			return { success: true };
-		} catch (error) {
-			console.error("Failed to save RSVP to Supabase:", error);
-			return { success: false, error: "Failed to save RSVP." };
+const GET_RSVP_QUERY = graphql(`
+  query GetRsvp($invite_id: UUID!) {
+	rsvpCollection(filter: { invite_id: { eq: $invite_id } }, first: 1) {
+	  edges {
+		node {
+		  id
+		  attending
+		  dietary
 		}
-	});
+	  }
+	}
+  }
+`);
+
+const INSERT_RSVP_MUTATION = graphql(`
+  mutation InsertRsvp($invite_id: UUID!, $attending: Boolean!, $dietary: String) {
+	insertIntorsvpCollection(objects: [
+	  {
+		invite_id: $invite_id,
+		attending: $attending,
+		dietary: $dietary
+	  }
+	]) {
+	  records {
+		id
+	  }
+	}
+  }
+`);
+
+const UPDATE_RSVP_MUTATION = graphql(`
+  mutation UpdateRsvp($invite_id: UUID!, $attending: Boolean!, $dietary: String) {
+	updatersvpCollection(
+	  filter: { invite_id: { eq: $invite_id } }
+	  set: { attending: $attending, dietary: $dietary }
+	) {
+	  records {
+		id
+	  }
+	}
+  }
+`);
+
+export async function getRsvp(invite_id: string) {
+	try {
+		const result: any = await supabaseGraphqlClient.request(GET_RSVP_QUERY, { invite_id });
+		const node = result?.rsvpCollection?.edges?.[0]?.node;
+		return node ?? null;
+	} catch (error) {
+		console.error("Failed to fetch RSVP:", error);
+		return null;
+	}
+}
+
+export async function submitRsvp({ invite_id, attending, dietary }: RsvpInput) {
+	try {
+		await supabaseGraphqlClient.request(INSERT_RSVP_MUTATION, {
+			invite_id,
+			attending: attending === "yes",
+			dietary: dietary || null,
+		});
+		return { success: true };
+	} catch (error) {
+		console.error("Failed to save RSVP:", error);
+		return { success: false, error: "Failed to save RSVP." };
+	}
+}
+
+export async function updateRsvp({ invite_id, attending, dietary }: RsvpInput) {
+	try {
+		const data: any = await supabaseGraphqlClient.request(UPDATE_RSVP_MUTATION, {
+			invite_id,
+			attending: attending === "yes",
+			dietary: dietary || null,
+		});
+		const updated = data?.updatersvpCollection?.records?.length ?? 0;
+		if (!updated) {
+			console.error("updateRsvp: no rows matched", invite_id);
+			return { success: false, error: "RSVP record not found." };
+		}
+		return { success: true };
+	} catch (error) {
+		console.error("Failed to update RSVP:", error);
+		return { success: false, error: "Failed to update RSVP." };
+	}
+}
