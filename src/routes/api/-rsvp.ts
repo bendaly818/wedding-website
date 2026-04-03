@@ -5,6 +5,9 @@ type RsvpInput = {
 	invite_id: string;
 	attending: string;
 	dietary?: string;
+	transit?: boolean | null;
+	physical_invite?: boolean | null;
+	song_recommendations?: string;
 };
 
 const GET_RSVP_QUERY = graphql(`
@@ -15,6 +18,9 @@ const GET_RSVP_QUERY = graphql(`
 		  id
 		  attending
 		  dietary
+		  transit
+		  physical_invite
+		  song_recommendations
 		}
 	  }
 	}
@@ -22,12 +28,15 @@ const GET_RSVP_QUERY = graphql(`
 `);
 
 const INSERT_RSVP_MUTATION = graphql(`
-  mutation InsertRsvp($invite_id: UUID!, $attending: Boolean!, $dietary: String) {
+  mutation InsertRsvp($invite_id: UUID!, $attending: Boolean!, $dietary: String, $transit: Boolean, $physical_invite: Boolean, $song_recommendations: String) {
 	insertIntorsvpCollection(objects: [
 	  {
 		invite_id: $invite_id,
 		attending: $attending,
-		dietary: $dietary
+		dietary: $dietary,
+		transit: $transit,
+		physical_invite: $physical_invite,
+		song_recommendations: $song_recommendations
 	  }
 	]) {
 	  records {
@@ -38,10 +47,10 @@ const INSERT_RSVP_MUTATION = graphql(`
 `);
 
 const UPDATE_RSVP_MUTATION = graphql(`
-  mutation UpdateRsvp($invite_id: UUID!, $attending: Boolean!, $dietary: String) {
+  mutation UpdateRsvp($invite_id: UUID!, $attending: Boolean!, $dietary: String, $transit: Boolean, $physical_invite: Boolean, $song_recommendations: String) {
 	updatersvpCollection(
 	  filter: { invite_id: { eq: $invite_id } }
-	  set: { attending: $attending, dietary: $dietary }
+	  set: { attending: $attending, dietary: $dietary, transit: $transit, physical_invite: $physical_invite, song_recommendations: $song_recommendations }
 	) {
 	  records {
 		id
@@ -61,12 +70,15 @@ export async function getRsvp(invite_id: string) {
 	}
 }
 
-export async function submitRsvp({ invite_id, attending, dietary }: RsvpInput) {
+export async function submitRsvp({ invite_id, attending, dietary, transit, physical_invite, song_recommendations }: RsvpInput) {
 	try {
 		await supabaseGraphqlClient.request(INSERT_RSVP_MUTATION, {
 			invite_id,
 			attending: attending === "yes",
 			dietary: dietary || null,
+			transit: transit ?? null,
+			physical_invite: physical_invite ?? null,
+			song_recommendations: song_recommendations || null,
 		});
 		return { success: true };
 	} catch (error) {
@@ -75,12 +87,15 @@ export async function submitRsvp({ invite_id, attending, dietary }: RsvpInput) {
 	}
 }
 
-export async function updateRsvp({ invite_id, attending, dietary }: RsvpInput) {
+export async function updateRsvp({ invite_id, attending, dietary, transit, physical_invite, song_recommendations }: RsvpInput) {
 	try {
 		const data: any = await supabaseGraphqlClient.request(UPDATE_RSVP_MUTATION, {
 			invite_id,
 			attending: attending === "yes",
 			dietary: dietary || null,
+			transit: transit ?? null,
+			physical_invite: physical_invite ?? null,
+			song_recommendations: song_recommendations || null,
 		});
 		const updated = data?.updatersvpCollection?.records?.length ?? 0;
 		if (!updated) {

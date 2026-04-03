@@ -427,7 +427,6 @@ type invite implements Node {
   name: String
   """Globally Unique Record Identifier"""
   nodeId: ID!
-  rsvp: rsvp
   rsvpCollection(
     """Query values in the collection after the provided cursor"""
     after: Cursor
@@ -446,7 +445,6 @@ type invite implements Node {
     """Sort order to apply to the collection"""
     orderBy: [rsvpOrderBy!]
   ): rsvpConnection
-  rsvp_id: UUID
   sent: Boolean
 }
 
@@ -483,7 +481,6 @@ input inviteFilter {
   Returns true if at least one of its inner filters is true, otherwise returns false
   """
   or: [inviteFilter!]
-  rsvp_id: UUIDFilter
   sent: BooleanFilter
 }
 
@@ -492,7 +489,6 @@ input inviteInsertInput {
   id: UUID
   message: String
   name: String
-  rsvp_id: UUID
   sent: Boolean
 }
 
@@ -508,7 +504,6 @@ input inviteOrderBy {
   id: OrderByDirection
   message: OrderByDirection
   name: OrderByDirection
-  rsvp_id: OrderByDirection
   sent: OrderByDirection
 }
 
@@ -517,7 +512,6 @@ input inviteUpdateInput {
   id: UUID
   message: String
   name: String
-  rsvp_id: UUID
   sent: Boolean
 }
 
@@ -534,27 +528,12 @@ type rsvp implements Node {
   dietary: String
   id: UUID!
   invite: invite
-  inviteCollection(
-    """Query values in the collection after the provided cursor"""
-    after: Cursor
-    """Query values in the collection before the provided cursor"""
-    before: Cursor
-    """Filters to apply to the results set when querying from the collection"""
-    filter: inviteFilter
-    """Query the first `n` records in the collection"""
-    first: Int
-    """Query the last `n` records in the collection"""
-    last: Int
-    """
-    Skip n values from the after cursor. Alternative to cursor pagination. Backward pagination not supported.
-    """
-    offset: Int
-    """Sort order to apply to the collection"""
-    orderBy: [inviteOrderBy!]
-  ): inviteConnection
   invite_id: UUID
   """Globally Unique Record Identifier"""
   nodeId: ID!
+  physical_invite: Boolean
+  song_recommendations: String
+  transit: Boolean
 }
 
 type rsvpConnection {
@@ -591,6 +570,9 @@ input rsvpFilter {
   Returns true if at least one of its inner filters is true, otherwise returns false
   """
   or: [rsvpFilter!]
+  physical_invite: BooleanFilter
+  song_recommendations: StringFilter
+  transit: BooleanFilter
 }
 
 input rsvpInsertInput {
@@ -599,6 +581,9 @@ input rsvpInsertInput {
   dietary: String
   id: UUID
   invite_id: UUID
+  physical_invite: Boolean
+  song_recommendations: String
+  transit: Boolean
 }
 
 type rsvpInsertResponse {
@@ -614,6 +599,9 @@ input rsvpOrderBy {
   dietary: OrderByDirection
   id: OrderByDirection
   invite_id: OrderByDirection
+  physical_invite: OrderByDirection
+  song_recommendations: OrderByDirection
+  transit: OrderByDirection
 }
 
 input rsvpUpdateInput {
@@ -622,6 +610,9 @@ input rsvpUpdateInput {
   dietary: String
   id: UUID
   invite_id: UUID
+  physical_invite: Boolean
+  song_recommendations: String
+  transit: Boolean
 }
 
 type rsvpUpdateResponse {

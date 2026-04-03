@@ -9,11 +9,4 @@
     "VITE_SUPABASE_URL": "https://jhomnlzkpbnwhksgpvga.supabase.co",
     "VITE_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_5ZfTz8rvrT7-cibq7VJC0g_vo202Kl1"
   },
-  "secrets_store_secrets": [
-    {
-      "binding": "SUPABASE_SECRET_KEY",
-      "store_id": "3fac7ba94cd04cfa96004ffcb56e7826",
-      "secret_name": "SUPABASE_SECRET_KEY"
-    }
-  ]
 }

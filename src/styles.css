@@ -44,56 +44,6 @@
   --accent-green-text: #5e6e2a;   /* darker for legibility on light bg */
 }
 
-:root[data-theme="dark"] {
-  --bg-color: var(--color-wine-dark);
-  --text-color: var(--color-blush-light);
-  --header-bg: rgba(74, 14, 36, 0.92);
-  --nav-link-color: #e8d8c8;
-  --nav-link-hover: #e8d8c8;
-
-  /* Section backgrounds — same dark wine base, subtle steps */
-  --section-s1: #3d0d22;
-  --section-s2: #461228;
-  --section-s3: #50182f;
-
-  /* Adaptive flips */
-  --heading-on-bg: #e8d8c8;
-  --outline-btn-color: #e8d8c8;
-
-  --card-bg: #3a0920;
-  --card-border: #5a2a3a;
-  --card-heading: #e8d8c8;
-  --card-text: var(--color-blush-light);
-
-  /* Pistachio reads fine on dark wine */
-  --accent-green: var(--color-pistachio);
-  --accent-green-text: var(--color-pistachio);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg-color: var(--color-wine-dark);
-    --text-color: var(--color-blush-light);
-    --header-bg: rgba(74, 14, 36, 0.92);
-    --nav-link-color: #e8d8c8;
-    --nav-link-hover: #e8d8c8;
-
-    --section-s1: #3d0d22;
-    --section-s2: #461228;
-    --section-s3: #50182f;
-
-    --heading-on-bg: #e8d8c8;
-    --outline-btn-color: #e8d8c8;
-
-    --card-bg: #3a0920;
-    --card-border: #5a2a3a;
-    --card-heading: #e8d8c8;
-    --card-text: var(--color-blush-light);
-
-    --accent-green: var(--color-pistachio);
-    --accent-green-text: var(--color-pistachio);
-  }
-}
 
 * {
   box-sizing: border-box;

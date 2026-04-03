@@ -388,9 +388,7 @@ export type Invite = Node & {
   name?: Maybe<Scalars['String']['output']>;
   /** Globally Unique Record Identifier */
   nodeId: Scalars['ID']['output'];
-  rsvp?: Maybe<Rsvp>;
   rsvpCollection?: Maybe<RsvpConnection>;
-  rsvp_id?: Maybe<Scalars['UUID']['output']>;
   sent?: Maybe<Scalars['Boolean']['output']>;
 };
 
@@ -437,7 +435,6 @@ export type InviteFilter = {
   not?: InputMaybe<InviteFilter>;
   /** Returns true if at least one of its inner filters is true, otherwise returns false */
   or?: InputMaybe<Array<InviteFilter>>;
-  rsvp_id?: InputMaybe<UuidFilter>;
   sent?: InputMaybe<BooleanFilter>;
 };
 
@@ -446,7 +443,6 @@ export type InviteInsertInput = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   message?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
-  rsvp_id?: InputMaybe<Scalars['UUID']['input']>;
   sent?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
@@ -463,7 +459,6 @@ export type InviteOrderBy = {
   id?: InputMaybe<OrderByDirection>;
   message?: InputMaybe<OrderByDirection>;
   name?: InputMaybe<OrderByDirection>;
-  rsvp_id?: InputMaybe<OrderByDirection>;
   sent?: InputMaybe<OrderByDirection>;
 };
 
@@ -472,7 +467,6 @@ export type InviteUpdateInput = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   message?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
-  rsvp_id?: InputMaybe<Scalars['UUID']['input']>;
   sent?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
@@ -491,21 +485,12 @@ export type Rsvp = Node & {
   dietary?: Maybe<Scalars['String']['output']>;
   id: Scalars['UUID']['output'];
   invite?: Maybe<Invite>;
-  inviteCollection?: Maybe<InviteConnection>;
   invite_id?: Maybe<Scalars['UUID']['output']>;
   /** Globally Unique Record Identifier */
   nodeId: Scalars['ID']['output'];
-};
-
-
-export type RsvpInviteCollectionArgs = {
-  after?: InputMaybe<Scalars['Cursor']['input']>;
-  before?: InputMaybe<Scalars['Cursor']['input']>;
-  filter?: InputMaybe<InviteFilter>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<Array<InviteOrderBy>>;
+  physical_invite?: Maybe<Scalars['Boolean']['output']>;
+  song_recommendations?: Maybe<Scalars['String']['output']>;
+  transit?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type RsvpConnection = {
@@ -541,6 +526,9 @@ export type RsvpFilter = {
   not?: InputMaybe<RsvpFilter>;
   /** Returns true if at least one of its inner filters is true, otherwise returns false */
   or?: InputMaybe<Array<RsvpFilter>>;
+  physical_invite?: InputMaybe<BooleanFilter>;
+  song_recommendations?: InputMaybe<StringFilter>;
+  transit?: InputMaybe<BooleanFilter>;
 };
 
 export type RsvpInsertInput = {
@@ -549,6 +537,9 @@ export type RsvpInsertInput = {
   dietary?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   invite_id?: InputMaybe<Scalars['UUID']['input']>;
+  physical_invite?: InputMaybe<Scalars['Boolean']['input']>;
+  song_recommendations?: InputMaybe<Scalars['String']['input']>;
+  transit?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type RsvpInsertResponse = {
@@ -565,6 +556,9 @@ export type RsvpOrderBy = {
   dietary?: InputMaybe<OrderByDirection>;
   id?: InputMaybe<OrderByDirection>;
   invite_id?: InputMaybe<OrderByDirection>;
+  physical_invite?: InputMaybe<OrderByDirection>;
+  song_recommendations?: InputMaybe<OrderByDirection>;
+  transit?: InputMaybe<OrderByDirection>;
 };
 
 export type RsvpUpdateInput = {
@@ -573,6 +567,9 @@ export type RsvpUpdateInput = {
   dietary?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   invite_id?: InputMaybe<Scalars['UUID']['input']>;
+  physical_invite?: InputMaybe<Scalars['Boolean']['input']>;
+  song_recommendations?: InputMaybe<Scalars['String']['input']>;
+  transit?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type RsvpUpdateResponse = {
@@ -609,12 +606,15 @@ export type GetRsvpQueryVariables = Exact<{
 }>;
 
 
-export type GetRsvpQuery = { __typename?: 'Query', rsvpCollection?: { __typename?: 'rsvpConnection', edges: Array<{ __typename?: 'rsvpEdge', node: { __typename?: 'rsvp', id: any, attending?: boolean | null, dietary?: string | null } }> } | null };
+export type GetRsvpQuery = { __typename?: 'Query', rsvpCollection?: { __typename?: 'rsvpConnection', edges: Array<{ __typename?: 'rsvpEdge', node: { __typename?: 'rsvp', id: any, attending?: boolean | null, dietary?: string | null, transit?: boolean | null, physical_invite?: boolean | null, song_recommendations?: string | null } }> } | null };
 
 export type InsertRsvpMutationVariables = Exact<{
   invite_id: Scalars['UUID']['input'];
   attending: Scalars['Boolean']['input'];
   dietary?: InputMaybe<Scalars['String']['input']>;
+  transit?: InputMaybe<Scalars['Boolean']['input']>;
+  physical_invite?: InputMaybe<Scalars['Boolean']['input']>;
+  song_recommendations?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
@@ -624,6 +624,9 @@ export type UpdateRsvpMutationVariables = Exact<{
   invite_id: Scalars['UUID']['input'];
   attending: Scalars['Boolean']['input'];
   dietary?: InputMaybe<Scalars['String']['input']>;
+  transit?: InputMaybe<Scalars['Boolean']['input']>;
+  physical_invite?: InputMaybe<Scalars['Boolean']['input']>;
+  song_recommendations?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
@@ -633,9 +636,9 @@ export type UpdateRsvpMutation = { __typename?: 'Mutation', updatersvpCollection
 export const GetAllInvitesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAllInvites"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inviteCollection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"created_at"},"value":{"kind":"EnumValue","value":"DescNullsLast"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"sent"}},{"kind":"Field","name":{"kind":"Name","value":"rsvpCollection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"attending"}},{"kind":"Field","name":{"kind":"Name","value":"dietary"}}]}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetAllInvitesQuery, GetAllInvitesQueryVariables>;
 export const AddInviteDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddInvite"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"name"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"message"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"sent"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"insertIntoinviteCollection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"objects"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"name"},"value":{"kind":"Variable","name":{"kind":"Name","value":"name"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"message"},"value":{"kind":"Variable","name":{"kind":"Name","value":"message"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"sent"},"value":{"kind":"Variable","name":{"kind":"Name","value":"sent"}}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"records"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<AddInviteMutation, AddInviteMutationVariables>;
 export const GetInviteDetailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetInviteDetail"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inviteCollection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}]}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"1"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetInviteDetailQuery, GetInviteDetailQueryVariables>;
-export const GetRsvpDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetRsvp"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"invite_id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rsvpCollection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"invite_id"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"invite_id"}}}]}}]}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"1"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"attending"}},{"kind":"Field","name":{"kind":"Name","value":"dietary"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetRsvpQuery, GetRsvpQueryVariables>;
-export const InsertRsvpDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"InsertRsvp"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"invite_id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"attending"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"dietary"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"insertIntorsvpCollection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"objects"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"invite_id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"invite_id"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"attending"},"value":{"kind":"Variable","name":{"kind":"Name","value":"attending"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"dietary"},"value":{"kind":"Variable","name":{"kind":"Name","value":"dietary"}}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"records"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<InsertRsvpMutation, InsertRsvpMutationVariables>;
-export const UpdateRsvpDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateRsvp"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"invite_id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"attending"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"dietary"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updatersvpCollection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"invite_id"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"invite_id"}}}]}}]}},{"kind":"Argument","name":{"kind":"Name","value":"set"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"attending"},"value":{"kind":"Variable","name":{"kind":"Name","value":"attending"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"dietary"},"value":{"kind":"Variable","name":{"kind":"Name","value":"dietary"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"records"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateRsvpMutation, UpdateRsvpMutationVariables>;
+export const GetRsvpDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetRsvp"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"invite_id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rsvpCollection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"invite_id"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"invite_id"}}}]}}]}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"1"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"attending"}},{"kind":"Field","name":{"kind":"Name","value":"dietary"}},{"kind":"Field","name":{"kind":"Name","value":"transit"}},{"kind":"Field","name":{"kind":"Name","value":"physical_invite"}},{"kind":"Field","name":{"kind":"Name","value":"song_recommendations"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetRsvpQuery, GetRsvpQueryVariables>;
+export const InsertRsvpDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"InsertRsvp"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"invite_id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"attending"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"dietary"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"transit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"physical_invite"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"song_recommendations"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"insertIntorsvpCollection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"objects"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"invite_id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"invite_id"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"attending"},"value":{"kind":"Variable","name":{"kind":"Name","value":"attending"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"dietary"},"value":{"kind":"Variable","name":{"kind":"Name","value":"dietary"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"transit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"transit"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"physical_invite"},"value":{"kind":"Variable","name":{"kind":"Name","value":"physical_invite"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"song_recommendations"},"value":{"kind":"Variable","name":{"kind":"Name","value":"song_recommendations"}}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"records"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<InsertRsvpMutation, InsertRsvpMutationVariables>;
+export const UpdateRsvpDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateRsvp"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"invite_id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"attending"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"dietary"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"transit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"physical_invite"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"song_recommendations"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updatersvpCollection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"invite_id"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"invite_id"}}}]}}]}},{"kind":"Argument","name":{"kind":"Name","value":"set"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"attending"},"value":{"kind":"Variable","name":{"kind":"Name","value":"attending"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"dietary"},"value":{"kind":"Variable","name":{"kind":"Name","value":"dietary"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"transit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"transit"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"physical_invite"},"value":{"kind":"Variable","name":{"kind":"Name","value":"physical_invite"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"song_recommendations"},"value":{"kind":"Variable","name":{"kind":"Name","value":"song_recommendations"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"records"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateRsvpMutation, UpdateRsvpMutationVariables>;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: { input: string; output: string; }
@@ -1017,9 +1020,7 @@ export type Invite = Node & {
   name?: Maybe<Scalars['String']['output']>;
   /** Globally Unique Record Identifier */
   nodeId: Scalars['ID']['output'];
-  rsvp?: Maybe<Rsvp>;
   rsvpCollection?: Maybe<RsvpConnection>;
-  rsvp_id?: Maybe<Scalars['UUID']['output']>;
   sent?: Maybe<Scalars['Boolean']['output']>;
 };
 
@@ -1066,7 +1067,6 @@ export type InviteFilter = {
   not?: InputMaybe<InviteFilter>;
   /** Returns true if at least one of its inner filters is true, otherwise returns false */
   or?: InputMaybe<Array<InviteFilter>>;
-  rsvp_id?: InputMaybe<UuidFilter>;
   sent?: InputMaybe<BooleanFilter>;
 };
 
@@ -1075,7 +1075,6 @@ export type InviteInsertInput = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   message?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
-  rsvp_id?: InputMaybe<Scalars['UUID']['input']>;
   sent?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
@@ -1092,7 +1091,6 @@ export type InviteOrderBy = {
   id?: InputMaybe<OrderByDirection>;
   message?: InputMaybe<OrderByDirection>;
   name?: InputMaybe<OrderByDirection>;
-  rsvp_id?: InputMaybe<OrderByDirection>;
   sent?: InputMaybe<OrderByDirection>;
 };
 
@@ -1101,7 +1099,6 @@ export type InviteUpdateInput = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   message?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
-  rsvp_id?: InputMaybe<Scalars['UUID']['input']>;
   sent?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
@@ -1120,21 +1117,12 @@ export type Rsvp = Node & {
   dietary?: Maybe<Scalars['String']['output']>;
   id: Scalars['UUID']['output'];
   invite?: Maybe<Invite>;
-  inviteCollection?: Maybe<InviteConnection>;
   invite_id?: Maybe<Scalars['UUID']['output']>;
   /** Globally Unique Record Identifier */
   nodeId: Scalars['ID']['output'];
-};
-
-
-export type RsvpInviteCollectionArgs = {
-  after?: InputMaybe<Scalars['Cursor']['input']>;
-  before?: InputMaybe<Scalars['Cursor']['input']>;
-  filter?: InputMaybe<InviteFilter>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<Array<InviteOrderBy>>;
+  physical_invite?: Maybe<Scalars['Boolean']['output']>;
+  song_recommendations?: Maybe<Scalars['String']['output']>;
+  transit?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type RsvpConnection = {
@@ -1170,6 +1158,9 @@ export type RsvpFilter = {
   not?: InputMaybe<RsvpFilter>;
   /** Returns true if at least one of its inner filters is true, otherwise returns false */
   or?: InputMaybe<Array<RsvpFilter>>;
+  physical_invite?: InputMaybe<BooleanFilter>;
+  song_recommendations?: InputMaybe<StringFilter>;
+  transit?: InputMaybe<BooleanFilter>;
 };
 
 export type RsvpInsertInput = {
@@ -1178,6 +1169,9 @@ export type RsvpInsertInput = {
   dietary?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   invite_id?: InputMaybe<Scalars['UUID']['input']>;
+  physical_invite?: InputMaybe<Scalars['Boolean']['input']>;
+  song_recommendations?: InputMaybe<Scalars['String']['input']>;
+  transit?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type RsvpInsertResponse = {
@@ -1194,6 +1188,9 @@ export type RsvpOrderBy = {
   dietary?: InputMaybe<OrderByDirection>;
   id?: InputMaybe<OrderByDirection>;
   invite_id?: InputMaybe<OrderByDirection>;
+  physical_invite?: InputMaybe<OrderByDirection>;
+  song_recommendations?: InputMaybe<OrderByDirection>;
+  transit?: InputMaybe<OrderByDirection>;
 };
 
 export type RsvpUpdateInput = {
@@ -1202,6 +1199,9 @@ export type RsvpUpdateInput = {
   dietary?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   invite_id?: InputMaybe<Scalars['UUID']['input']>;
+  physical_invite?: InputMaybe<Scalars['Boolean']['input']>;
+  song_recommendations?: InputMaybe<Scalars['String']['input']>;
+  transit?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type RsvpUpdateResponse = {

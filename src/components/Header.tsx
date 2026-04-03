@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import ThemeToggle from "./ThemeToggle";
 
 export default function Header() {
 	return (
@@ -7,7 +6,7 @@ export default function Header() {
 			<nav className="page-wrap flex items-center justify-between py-4">
 				<h2 className="m-0 flex-shrink-0 text-xl font-serif text-[var(--text-color)]">
 					<Link to="/" className="no-underline">
-						Brit & Ben
+						Ben & Brit
 					</Link>
 				</h2>
 
@@ -24,10 +23,6 @@ export default function Header() {
 					<a href="#rsvp" className="nav-link">
 						RSVP
 					</a>
-				</div>
-
-				<div className="flex items-center">
-					<ThemeToggle />
 				</div>
 			</nav>
 		</header>
