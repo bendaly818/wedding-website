@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useCallback, useEffect, useState } from "react";
 import { z } from "zod";
-import { useState, useEffect, useCallback } from "react";
-import { submitRsvp, updateRsvp, getRsvp } from "./api/-rsvp";
-import { getInvite } from "./api/-invite";
 import Button from "../components/ui/Button";
-import RadioCard from "../components/ui/RadioCard";
 import FormField from "../components/ui/FormField";
 import PageSection from "../components/ui/PageSection";
+import RadioCard from "../components/ui/RadioCard";
+import { getInvite } from "./api/-invite";
+import { getRsvp, submitRsvp, updateRsvp } from "./api/-rsvp";
 
 const searchSchema = z.object({
 	id: z.string().optional(),
@@ -22,24 +22,35 @@ const INVITE_KEY = "wedding_invite_id";
 const OPENED_KEY = "wedding_envelope_opened_ids";
 
 function readStoredId(): string | null {
-	try { return localStorage.getItem(INVITE_KEY); } catch { return null; }
+	try {
+		return localStorage.getItem(INVITE_KEY);
+	} catch {
+		return null;
+	}
 }
 function persistId(id: string) {
-	try { localStorage.setItem(INVITE_KEY, id); } catch {}
+	try {
+		localStorage.setItem(INVITE_KEY, id);
+	} catch {}
 }
 function clearStoredId() {
-	try { localStorage.removeItem(INVITE_KEY); } catch {}
+	try {
+		localStorage.removeItem(INVITE_KEY);
+	} catch {}
 }
 function hasOpenedEnvelope(id: string): boolean {
 	try {
 		const ids: string[] = JSON.parse(localStorage.getItem(OPENED_KEY) ?? "[]");
 		return ids.includes(id);
-	} catch { return false; }
+	} catch {
+		return false;
+	}
 }
 function markEnvelopeOpened(id: string) {
 	try {
 		const ids: string[] = JSON.parse(localStorage.getItem(OPENED_KEY) ?? "[]");
-		if (!ids.includes(id)) localStorage.setItem(OPENED_KEY, JSON.stringify([...ids, id]));
+		if (!ids.includes(id))
+			localStorage.setItem(OPENED_KEY, JSON.stringify([...ids, id]));
 	} catch {}
 }
 
@@ -64,15 +75,18 @@ function ComingSoon() {
 					Are getting married
 				</p>
 				<div className="flex gap-3 justify-center mb-10">
-					{[0.20, 0.32, 0.44, 0.56, 0.68].map((opacity) => (
-						<span key={opacity} style={{ color: "var(--color-wine)", opacity }}>✦</span>
+					{[0.2, 0.32, 0.44, 0.56, 0.68].map((opacity) => (
+						<span key={opacity} style={{ color: "var(--color-wine)", opacity }}>
+							✦
+						</span>
 					))}
 				</div>
 				<p
 					className="text-base leading-relaxed mb-6"
 					style={{ color: "var(--heading-on-bg)", opacity: 0.6 }}
 				>
-					Something wonderful is on its way. Check back once you have your invitation in hand.
+					Something wonderful is on its way. Check back once you have your
+					invitation in hand.
 				</p>
 				<p
 					className="text-sm font-semibold tracking-widest uppercase"
@@ -93,7 +107,9 @@ function EnvelopeOverlay({
 	guestName: string | null;
 	onOpened: () => void;
 }) {
-	const [phase, setPhase] = useState<"sealed" | "opening" | "exiting">("sealed");
+	const [phase, setPhase] = useState<"sealed" | "opening" | "exiting">(
+		"sealed",
+	);
 
 	const handleOpen = useCallback(() => {
 		if (phase !== "sealed") return;
@@ -111,7 +127,11 @@ function EnvelopeOverlay({
 			tabIndex={0}
 			aria-label="Open your invitation"
 			onClick={phase === "sealed" ? handleOpen : undefined}
-			onKeyDown={phase === "sealed" ? (e) => e.key === "Enter" && handleOpen() : undefined}
+			onKeyDown={
+				phase === "sealed"
+					? (e) => e.key === "Enter" && handleOpen()
+					: undefined
+			}
 		>
 			<p
 				className="font-serif italic text-sm"
@@ -148,7 +168,10 @@ function EnvelopeOverlay({
 				<button
 					type="button"
 					className="envelope-cta"
-					onClick={(e) => { e.stopPropagation(); handleOpen(); }}
+					onClick={(e) => {
+						e.stopPropagation();
+						handleOpen();
+					}}
 				>
 					Open your invitation
 				</button>
@@ -167,14 +190,22 @@ function App() {
 	const [inviteId, setInviteId] = useState<string | null>(null);
 	const [stage, setStage] = useState<Stage>("initializing");
 	const [guestName, setGuestName] = useState<string | null>(null);
-	const [existingRsvp, setExistingRsvp] = useState<{ attending: boolean; dietary?: string | null; transit?: boolean | null; physical_invite?: boolean | null; song_recommendations?: string | null } | null>(null);
+	const [existingRsvp, setExistingRsvp] = useState<{
+		attending: boolean;
+		dietary?: string | null;
+		transit?: boolean | null;
+		physical_invite?: boolean | null;
+		song_recommendations?: string | null;
+	} | null>(null);
 	const [isEditing, setIsEditing] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
 	const [formAttending, setFormAttending] = useState<"yes" | "no" | "">("");
 	const [formDietary, setFormDietary] = useState("");
 	const [formTransit, setFormTransit] = useState<boolean | null>(null);
-	const [formPhysicalInvite, setFormPhysicalInvite] = useState<boolean | null>(null);
+	const [formPhysicalInvite, setFormPhysicalInvite] = useState<boolean | null>(
+		null,
+	);
 	const [formSongRecs, setFormSongRecs] = useState("");
 
 	useEffect(() => {
@@ -215,13 +246,18 @@ function App() {
 			}
 		}
 		load();
-		return () => { cancelled = true; };
+		return () => {
+			cancelled = true;
+		};
 	}, [inviteId]);
 
 	useEffect(() => {
-		const showingForm = stage === "site" && !isSuccess && (isEditing || !existingRsvp);
+		const showingForm =
+			stage === "site" && !isSuccess && (isEditing || !existingRsvp);
 		if (!showingForm) return;
-		setFormAttending(existingRsvp ? (existingRsvp.attending ? "yes" : "no") : "");
+		setFormAttending(
+			existingRsvp ? (existingRsvp.attending ? "yes" : "no") : "",
+		);
 		setFormDietary(existingRsvp?.dietary ?? "");
 		setFormTransit(existingRsvp?.transit ?? null);
 		setFormPhysicalInvite(existingRsvp?.physical_invite ?? null);
@@ -239,9 +275,22 @@ function App() {
 		setIsSubmitting(true);
 		try {
 			const fn = existingRsvp ? updateRsvp : submitRsvp;
-			const result = await fn({ invite_id: inviteId, attending: formAttending, dietary: formDietary, transit: formTransit, physical_invite: formPhysicalInvite, song_recommendations: formSongRecs });
+			const result = await fn({
+				invite_id: inviteId,
+				attending: formAttending,
+				dietary: formDietary,
+				transit: formTransit,
+				physical_invite: formPhysicalInvite,
+				song_recommendations: formSongRecs,
+			});
 			if (result.success) {
-				setExistingRsvp({ attending: formAttending === "yes", dietary: formDietary, transit: formTransit, physical_invite: formPhysicalInvite, song_recommendations: formSongRecs });
+				setExistingRsvp({
+					attending: formAttending === "yes",
+					dietary: formDietary,
+					transit: formTransit,
+					physical_invite: formPhysicalInvite,
+					song_recommendations: formSongRecs,
+				});
 				setIsEditing(false);
 				setIsSuccess(true);
 			} else {
@@ -263,7 +312,10 @@ function App() {
 		return (
 			<div
 				className="fullscreen-overlay"
-				style={{ background: "radial-gradient(ellipse at 50% 35%, #5c1529 0%, #1e0810 100%)" }}
+				style={{
+					background:
+						"radial-gradient(ellipse at 50% 35%, #5c1529 0%, #1e0810 100%)",
+				}}
 			>
 				<div
 					className="font-serif italic text-xl animate-pulse"
@@ -279,15 +331,18 @@ function App() {
 	return (
 		<>
 			{stage === "envelope" && (
-				<EnvelopeOverlay guestName={guestName} onOpened={handleEnvelopeOpened} />
+				<EnvelopeOverlay
+					guestName={guestName}
+					onOpened={handleEnvelopeOpened}
+				/>
 			)}
 
 			<main>
 				{/* ── HERO ── */}
-				<section
-					id="welcome"
+				<PageSection
+					id="home"
+					bg="s1"
 					className="min-h-screen flex flex-col items-center justify-center px-4 text-center pb-20 pt-10"
-					style={{ background: "var(--section-s1)" }}
 				>
 					<div className="max-w-2xl mx-auto">
 						<h1
@@ -310,14 +365,7 @@ function App() {
 						</div>
 
 						{guestName ? (
-							<div
-								className="mb-10 p-6 rounded-2xl inline-block border"
-								style={{
-									background: "var(--card-bg)",
-									borderColor: "var(--card-border)",
-									color: "var(--card-text)",
-								}}
-							>
+							<div className="mb-10 p-6 inline-block">
 								{existingRsvp ? (
 									<>
 										<p
@@ -327,13 +375,20 @@ function App() {
 											Thanks for RSVPing, {guestName}!
 										</p>
 										<p className="mt-2 mb-4 opacity-70">
-											We have you down as {existingRsvp.attending ? "attending 🎉" : "unable to make it"}.
+											We have you down as{" "}
+											{existingRsvp.attending
+												? "attending 🎉"
+												: "unable to make it"}
+											.
 										</p>
 										<Button
 											href="#rsvp"
 											variant="ghost"
 											size="sm"
-											onClick={() => { setIsEditing(true); setIsSuccess(false); }}
+											onClick={() => {
+												setIsEditing(true);
+												setIsSuccess(false);
+											}}
 										>
 											Edit Response
 										</Button>
@@ -364,51 +419,9 @@ function App() {
 							<Button href="#rsvp" variant="wine">
 								{existingRsvp ? "View RSVP" : "RSVP Now"}
 							</Button>
-							<Button href="#schedule" variant="outline">
+							<Button href="#travel" variant="ghost">
 								Details
 							</Button>
-						</div>
-					</div>
-				</section>
-
-				{/* ── OUR STORY ── */}
-				<PageSection id="story" bg="s2">
-					<div className="page-wrap text-center max-w-3xl mx-auto">
-						<h2
-							className="display-title text-4xl mb-8"
-							style={{ color: "var(--heading-on-bg)" }}
-						>
-							Our Story
-						</h2>
-						<p className="text-lg leading-relaxed mb-6 opacity-90">
-							Lorem, ipsum dolor sit amet consectetur adipisicing elit. Iste ab nulla ipsam quibusdam, cum inventore accusantium exercitationem maxime laboriosam in eius fuga aperiam ut doloribus vel facilis doloremque voluptate. Vero.
-						</p>
-						<p
-							className="text-lg leading-relaxed font-serif italic"
-							style={{ color: "var(--color-plum-pink)" }}
-						>
-							We couldn't be more thrilled to share this beautiful new chapter
-							with our closest family and friends.
-						</p>
-					</div>
-				</PageSection>
-
-				{/* ── SCHEDULE ── */}
-				<PageSection id="schedule">
-					<div className="page-wrap text-center">
-						<h2
-							className="display-title text-4xl mb-12"
-							style={{ color: "var(--heading-on-bg)" }}
-						>
-							Schedule
-						</h2>
-						<div className="max-w-xl mx-auto">
-							<p
-								className="text-lg italic"
-								style={{ color: "var(--color-plum-pink)" }}
-							>
-								More details to come as we finalize our plans...
-							</p>
 						</div>
 					</div>
 				</PageSection>
@@ -434,14 +447,10 @@ function App() {
 							>
 								Bridgewater Estate
 							</h3>
-							<p
-								className="text-lg mb-2 opacity-70"
-							>
+							<p className="text-lg mb-2 opacity-70">
 								Helensville, Auckland, New Zealand
 							</p>
-							<p
-								className="mb-8 font-serif text-xl tracking-wide"
-							>
+							<p className="mb-8 font-serif text-xl tracking-wide">
 								561 Peak Road, Auckland 0875
 							</p>
 							<Button
@@ -467,7 +476,7 @@ function App() {
 						</h2>
 
 						<div className="max-w-2xl mx-auto p-8 min-h-[400px] flex flex-col justify-center">
-							{isSuccess || (existingRsvp && !isEditing) ? (
+							{existingRsvp && !isEditing ? (
 								<div className="py-12">
 									<div className="text-6xl mb-6">💌</div>
 									<h3
@@ -477,11 +486,15 @@ function App() {
 										Thank You!
 									</h3>
 									<p className="text-lg opacity-70 mb-8">
-										Your RSVP has been sent. We can't wait to celebrate with you!
+										Your RSVP has been sent. We can't wait to celebrate with
+										you!
 									</p>
 									<Button
 										variant="ghost"
-										onClick={() => { setIsEditing(true); setIsSuccess(false); }}
+										onClick={() => {
+											setIsEditing(true);
+											setIsSuccess(false);
+										}}
 									>
 										Edit Response
 									</Button>
@@ -495,7 +508,9 @@ function App() {
 										Hi {guestName}!
 									</h3>
 									<p className="mb-8 opacity-70 text-lg">
-										{isEditing ? "Update your response below." : "We would love to know if you can make it to our special day."}
+										{isEditing
+											? "Update your response below."
+											: "We would love to know if you can make it to our special day."}
 									</p>
 									<form
 										className="flex flex-col gap-6 text-left"
@@ -537,7 +552,10 @@ function App() {
 											<label className="block text-sm font-bold uppercase tracking-wider mb-2">
 												Would you like transit to &amp; from the venue?
 											</label>
-											<p className="text-sm opacity-60 mb-3">We're arranging transport from a central Auckland location.</p>
+											<p className="text-sm opacity-60 mb-3">
+												We're arranging transport from a central Auckland
+												location.
+											</p>
 											<div className="flex gap-4">
 												<RadioCard
 													name="transit"
@@ -560,7 +578,9 @@ function App() {
 											<label className="block text-sm font-bold uppercase tracking-wider mb-2">
 												Would you like a physical invite?
 											</label>
-											<p className="text-sm opacity-60 mb-3">Something to put on the fridge and remember the day.</p>
+											<p className="text-sm opacity-60 mb-3">
+												Something to put on the fridge and remember the day.
+											</p>
 											<div className="flex gap-4">
 												<RadioCard
 													name="physical_invite"
@@ -606,44 +626,16 @@ function App() {
 												disabled={isSubmitting}
 												className="flex-1"
 											>
-												{isSubmitting ? "Saving..." : isEditing ? "Update RSVP" : "Send RSVP"}
+												{isSubmitting
+													? "Saving..."
+													: isEditing
+														? "Update RSVP"
+														: "Send RSVP"}
 											</Button>
 										</div>
 									</form>
 								</div>
-							) : (
-								<div>
-									<p className="mb-8 opacity-70 text-lg">
-										Please check your invitation for your bespoke link, or enter
-										your Invite ID below to find your invitation.
-									</p>
-									<div className="max-w-md mx-auto">
-										<form
-											className="flex flex-col gap-4"
-											onSubmit={(e) => {
-												e.preventDefault();
-												const code = (e.target as any).code.value;
-												window.location.href = `/?id=${code}#rsvp`;
-											}}
-										>
-											<input
-												name="code"
-												type="text"
-												placeholder="Enter your Invite ID..."
-												className="px-6 py-4 rounded-full font-bold text-center focus:outline-none focus:ring-2 border bg-white"
-												style={{
-													color: "var(--text-color)",
-													borderColor: "var(--card-border)",
-												}}
-												required
-											/>
-											<Button variant="primary" size="lg" type="submit">
-												Find Invitation
-											</Button>
-										</form>
-									</div>
-								</div>
-							)}
+							) : null}
 						</div>
 					</div>
 				</PageSection>

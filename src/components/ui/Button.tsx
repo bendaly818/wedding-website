@@ -4,10 +4,16 @@ type Variant = "primary" | "wine" | "outline" | "ghost";
 type Size = "sm" | "md" | "lg";
 
 const variantStyle: Record<Variant, React.CSSProperties> = {
-	primary: { background: "var(--color-plum-pink)", color: "var(--color-white)" },
-	wine:    { background: "var(--color-wine)", color: "var(--color-blush-light)" },
-	outline: { borderColor: "var(--outline-btn-color)", color: "var(--outline-btn-color)" },
-	ghost:   { borderColor: "var(--card-border)", color: "var(--heading-on-bg)" },
+	primary: {
+		background: "var(--color-wine)",
+		color: "var(--color-blush-light)",
+	},
+	wine: { background: "var(--color-wine)", color: "var(--color-blush-light)" },
+	outline: {
+		borderColor: "var(--outline-btn-color)",
+		color: "var(--outline-btn-color)",
+	},
+	ghost: { borderColor: "var(--card-border)", color: "var(--heading-on-bg)" },
 };
 
 const sizeClass: Record<Size, string> = {
@@ -50,14 +56,27 @@ export default function Button({
 
 	if (href !== undefined) {
 		return (
-			<a href={href} className={cls} style={style} onClick={onClick} target={target} rel={rel}>
+			<a
+				href={href}
+				className={cls}
+				style={style}
+				onClick={onClick}
+				target={target}
+				rel={rel}
+			>
 				{children}
 			</a>
 		);
 	}
 
 	return (
-		<button className={cls} style={style} type={type} disabled={disabled} onClick={onClick}>
+		<button
+			className={cls}
+			style={style}
+			type={type}
+			disabled={disabled}
+			onClick={onClick}
+		>
 			{children}
 		</button>
 	);
