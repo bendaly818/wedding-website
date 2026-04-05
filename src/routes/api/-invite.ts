@@ -1,5 +1,5 @@
-import { supabaseGraphqlClient } from "#/lib/supabase-graphql";
 import { graphql } from "#/gql";
+import { supabaseGraphqlClient } from "#/lib/supabase-graphql";
 
 const GET_INVITE_QUERY = graphql(`
   query GetInviteDetail($id: UUID!) {
@@ -8,20 +8,24 @@ const GET_INVITE_QUERY = graphql(`
 		node {
 		  id
 		  name
+		  message
 		}
 	  }
 	}
   }
 `);
 
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_REGEX =
+	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export async function getInvite(id: string) {
 	if (!UUID_REGEX.test(id)) {
 		return { success: false, error: "Invalid invite ID format." };
 	}
 	try {
-		const result: any = await supabaseGraphqlClient.request(GET_INVITE_QUERY, { id });
+		const result = await supabaseGraphqlClient.request(GET_INVITE_QUERY, {
+			id,
+		});
 		const invite = result?.inviteCollection?.edges?.[0]?.node;
 		if (!invite) {
 			return { success: false, error: "Invite not found." };

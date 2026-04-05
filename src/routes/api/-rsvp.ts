@@ -1,5 +1,5 @@
-import { supabaseGraphqlClient } from "#/lib/supabase-graphql";
 import { graphql } from "#/gql";
+import { supabaseGraphqlClient } from "#/lib/supabase-graphql";
 
 type RsvpInput = {
 	invite_id: string;
@@ -61,7 +61,9 @@ const UPDATE_RSVP_MUTATION = graphql(`
 
 export async function getRsvp(invite_id: string) {
 	try {
-		const result: any = await supabaseGraphqlClient.request(GET_RSVP_QUERY, { invite_id });
+		const result = await supabaseGraphqlClient.request(GET_RSVP_QUERY, {
+			invite_id,
+		});
 		const node = result?.rsvpCollection?.edges?.[0]?.node;
 		return node ?? null;
 	} catch (error) {
@@ -70,7 +72,14 @@ export async function getRsvp(invite_id: string) {
 	}
 }
 
-export async function submitRsvp({ invite_id, attending, dietary, transit, physical_invite, song_recommendations }: RsvpInput) {
+export async function submitRsvp({
+	invite_id,
+	attending,
+	dietary,
+	transit,
+	physical_invite,
+	song_recommendations,
+}: RsvpInput) {
 	try {
 		await supabaseGraphqlClient.request(INSERT_RSVP_MUTATION, {
 			invite_id,
@@ -87,16 +96,26 @@ export async function submitRsvp({ invite_id, attending, dietary, transit, physi
 	}
 }
 
-export async function updateRsvp({ invite_id, attending, dietary, transit, physical_invite, song_recommendations }: RsvpInput) {
+export async function updateRsvp({
+	invite_id,
+	attending,
+	dietary,
+	transit,
+	physical_invite,
+	song_recommendations,
+}: RsvpInput) {
 	try {
-		const data: any = await supabaseGraphqlClient.request(UPDATE_RSVP_MUTATION, {
-			invite_id,
-			attending: attending === "yes",
-			dietary: dietary || null,
-			transit: transit ?? null,
-			physical_invite: physical_invite ?? null,
-			song_recommendations: song_recommendations || null,
-		});
+		const data: any = await supabaseGraphqlClient.request(
+			UPDATE_RSVP_MUTATION,
+			{
+				invite_id,
+				attending: attending === "yes",
+				dietary: dietary || null,
+				transit: transit ?? null,
+				physical_invite: physical_invite ?? null,
+				song_recommendations: song_recommendations || null,
+			},
+		);
 		const updated = data?.updatersvpCollection?.records?.length ?? 0;
 		if (!updated) {
 			console.error("updateRsvp: no rows matched", invite_id);

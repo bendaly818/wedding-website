@@ -1,3 +1,4 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { z } from "zod";
@@ -114,8 +115,8 @@ function EnvelopeOverlay({
 	const handleOpen = useCallback(() => {
 		if (phase !== "sealed") return;
 		setPhase("opening");
-		setTimeout(() => setPhase("exiting"), 900);
-		setTimeout(onOpened, 1700);
+		setTimeout(() => setPhase("exiting"), 1200);
+		setTimeout(onOpened, 1800);
 	}, [phase, onOpened]);
 
 	const isAnimating = phase !== "sealed";
@@ -133,49 +134,74 @@ function EnvelopeOverlay({
 					: undefined
 			}
 		>
-			<p
-				className="font-serif italic text-sm"
-				style={{ color: "rgba(232,207,192,0.45)", letterSpacing: "0.3em" }}
-			>
-				You&apos;re Invited
-			</p>
+			<p className="envelope-tagline">You&apos;re Invited</p>
 
 			<div className={`envelope-outer${isAnimating ? " is-animating" : ""}`}>
-				{/* Envelope body */}
-				<div className="envelope-body">
+				{/* z:1 — back face of envelope */}
+				<div className="envelope-body-back" />
+
+				{/* z:2 → z:7 — letter rises between the two body layers */}
+				<div className={`envelope-letter${isAnimating ? " is-rising" : ""}`}>
+					<p className="envelope-letter-title">Ben &amp; Brit</p>
+					<div className="envelope-letter-divider" />
+					<p className="envelope-letter-date">November 6th, 2026</p>
+					<p className="envelope-letter-venue">Bridgewater Estate</p>
+				</div>
+
+				{/* z:3 — solid fold triangles over the letter */}
+				<div className="envelope-fold-left" />
+				<div className="envelope-fold-right" />
+				<div className="envelope-fold-bottom">
 					{guestName && (
 						<div className="envelope-address">
-							<span
-								className="font-serif italic text-sm"
-								style={{ color: "rgba(107,21,53,0.55)" }}
-							>
-								To: {guestName}
+							<span className="font-serif text-sm" style={{ color: "rgba(107,21,53,0.5)" }}>
+								{guestName}
 							</span>
 						</div>
 					)}
 				</div>
+				{/* Fold seam lines on top of everything */}
+				<div className="envelope-seams" />
 
-				{/* Flap */}
-				<div className={`envelope-flap${isAnimating ? " is-open" : ""}`} />
+				{/* Flap — two faces for visible 3D open */}
+				<div className={`envelope-flap${isAnimating ? " is-open" : ""}`}>
+					<div className="envelope-flap-front" />
+					<div className="envelope-flap-back" />
+				</div>
 
-				{/* Wax seal */}
+				{/* Wax seal SVG — organic blob shape */}
 				<div className={`envelope-seal${isAnimating ? " is-broken" : ""}`}>
-					B♥B
+					<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" width="72" height="72" aria-hidden="true">
+						{/* Organic wax blob — slightly irregular, like real pooled wax */}
+						<path
+							d="M40,6 C49,5 58,9 63,16 C68,22 70,30 68,38 C67,44 64,49 68,54 C72,59 72,67 66,72 C60,77 52,76 46,73 C42,71 39,73 35,74 C29,76 21,75 16,70 C11,65 11,57 14,51 C17,46 14,40 13,35 C11,28 13,19 19,14 C25,8 33,7 40,6 Z"
+							fill="#7a1535"
+						/>
+						{/* Subtle inner highlight — top-left, like light catching wax surface */}
+						<path
+							d="M40,6 C49,5 58,9 63,16 C68,22 70,30 68,38 C67,44 64,49 68,54 C72,59 72,67 66,72"
+							fill="none"
+							stroke="rgba(255,200,180,0.12)"
+							strokeWidth="6"
+							strokeLinecap="round"
+						/>
+						{/* Pressed ring — the impression left by a seal stamp */}
+						<circle cx="40" cy="40" r="24" fill="none" stroke="rgba(255,210,185,0.2)" strokeWidth="1" />
+						<circle cx="40" cy="40" r="19" fill="none" stroke="rgba(255,210,185,0.15)" strokeWidth="0.7" />
+						{/* Monogram */}
+						<text
+							x="40" y="43"
+							textAnchor="middle"
+							dominantBaseline="middle"
+							fontFamily="Georgia, 'Times New Roman', serif"
+							fontSize="14"
+							fontWeight="400"
+							fill="rgba(255,230,210,0.88)"
+							letterSpacing="2"
+						>B&amp;B</text>
+					</svg>
 				</div>
 			</div>
-
-			{phase === "sealed" && (
-				<button
-					type="button"
-					className="envelope-cta"
-					onClick={(e) => {
-						e.stopPropagation();
-						handleOpen();
-					}}
-				>
-					Open your invitation
-				</button>
-			)}
 		</div>
 	);
 }
@@ -186,19 +212,55 @@ type Stage = "initializing" | "no-invite" | "envelope" | "site";
 // ── App ───────────────────────────────────────────────────────────
 function App() {
 	const { id: urlId } = Route.useSearch();
+	const queryClient = useQueryClient();
 
-	const [inviteId, setInviteId] = useState<string | null>(null);
-	const [stage, setStage] = useState<Stage>("initializing");
-	const [guestName, setGuestName] = useState<string | null>(null);
-	const [existingRsvp, setExistingRsvp] = useState<{
-		attending: boolean;
-		dietary?: string | null;
-		transit?: boolean | null;
-		physical_invite?: boolean | null;
-		song_recommendations?: string | null;
-	} | null>(null);
+	// Resolve invite ID from URL param or localStorage (localStorage is client-only)
+	const [inviteId, setInviteId] = useState<string | null>(urlId ?? null);
+	const [idResolved, setIdResolved] = useState(!!urlId);
+	const [envelopeOpened, setEnvelopeOpened] = useState(false);
+
+	useEffect(() => {
+		const id = urlId ?? readStoredId();
+		if (id) persistId(id);
+		setInviteId(id ?? null);
+		setIdResolved(true);
+		if (id) setEnvelopeOpened(hasOpenedEnvelope(id));
+	}, [urlId]);
+
+	// Fetch invite
+	const inviteQuery = useQuery({
+		queryKey: ["invite", inviteId],
+		queryFn: async () => {
+			const res = await getInvite(inviteId!);
+			if (!res.success) clearStoredId();
+			return res;
+		},
+		enabled: idResolved && !!inviteId,
+	});
+
+	const invite = inviteQuery.data?.success ? inviteQuery.data.invite : null;
+	const guestName = invite?.name ?? null;
+
+	// Fetch RSVP (only once invite is confirmed)
+	const rsvpQuery = useQuery({
+		queryKey: ["rsvp", inviteId],
+		queryFn: () => getRsvp(inviteId!),
+		enabled: !!invite,
+	});
+
+	const existingRsvp = rsvpQuery.data ?? null;
+
+	// Derive stage from query states
+	const stage: Stage = (() => {
+		if (!idResolved) return "initializing";
+		if (!inviteId) return "no-invite";
+		if (inviteQuery.isPending) return "initializing";
+		if (!inviteQuery.data?.success) return "no-invite";
+		if (envelopeOpened) return "site";
+		return "envelope";
+	})();
+
 	const [isEditing, setIsEditing] = useState(false);
-	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
 	const [formAttending, setFormAttending] = useState<"yes" | "no" | "">("");
 	const [formDietary, setFormDietary] = useState("");
@@ -207,49 +269,6 @@ function App() {
 		null,
 	);
 	const [formSongRecs, setFormSongRecs] = useState("");
-
-	useEffect(() => {
-		const id = urlId ?? readStoredId();
-		if (id) {
-			persistId(id);
-			setInviteId(id);
-		} else {
-			setStage("no-invite");
-		}
-	}, [urlId]);
-
-	useEffect(() => {
-		if (!inviteId) return;
-		let cancelled = false;
-
-		async function load() {
-			let failed = false;
-			try {
-				const res = await getInvite(inviteId!);
-				if (cancelled) return;
-				if (res.success && res.invite) {
-					setGuestName(res.invite.name);
-					const rsvp = await getRsvp(inviteId!);
-					if (!cancelled && rsvp) setExistingRsvp(rsvp);
-				} else {
-					clearStoredId();
-					failed = true;
-				}
-			} catch {
-				failed = true;
-			}
-			if (cancelled) return;
-			if (failed) {
-				setStage("no-invite");
-			} else {
-				setStage(hasOpenedEnvelope(inviteId!) ? "site" : "envelope");
-			}
-		}
-		load();
-		return () => {
-			cancelled = true;
-		};
-	}, [inviteId]);
 
 	useEffect(() => {
 		const showingForm =
@@ -262,46 +281,49 @@ function App() {
 		setFormTransit(existingRsvp?.transit ?? null);
 		setFormPhysicalInvite(existingRsvp?.physical_invite ?? null);
 		setFormSongRecs(existingRsvp?.song_recommendations ?? "");
-	}, [isEditing, isSuccess, stage]);
+	}, [isEditing, isSuccess, stage, existingRsvp]);
+
+	const rsvpMutation = useMutation({
+		mutationFn: (input: Parameters<typeof submitRsvp>[0]) =>
+			existingRsvp ? updateRsvp(input) : submitRsvp(input),
+		onSuccess: (result, variables) => {
+			if (!result.success) {
+				alert("Something went wrong saving your RSVP. Please try again.");
+				return;
+			}
+			queryClient.setQueryData(["rsvp", inviteId], {
+				attending: variables.attending === "yes",
+				dietary: variables.dietary,
+				transit: variables.transit,
+				physical_invite: variables.physical_invite,
+				song_recommendations: variables.song_recommendations,
+			});
+			setIsEditing(false);
+			setIsSuccess(true);
+		},
+		onError: (error) => {
+			console.error(error);
+			alert("Something went wrong saving your RSVP. Please try again.");
+		},
+	});
+	const isSubmitting = rsvpMutation.isPending;
 
 	const handleEnvelopeOpened = useCallback(() => {
 		if (inviteId) markEnvelopeOpened(inviteId);
-		setStage("site");
+		setEnvelopeOpened(true);
 	}, [inviteId]);
 
-	const handleRsvpSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+	const handleRsvpSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		if (!inviteId) return;
-		setIsSubmitting(true);
-		try {
-			const fn = existingRsvp ? updateRsvp : submitRsvp;
-			const result = await fn({
-				invite_id: inviteId,
-				attending: formAttending,
-				dietary: formDietary,
-				transit: formTransit,
-				physical_invite: formPhysicalInvite,
-				song_recommendations: formSongRecs,
-			});
-			if (result.success) {
-				setExistingRsvp({
-					attending: formAttending === "yes",
-					dietary: formDietary,
-					transit: formTransit,
-					physical_invite: formPhysicalInvite,
-					song_recommendations: formSongRecs,
-				});
-				setIsEditing(false);
-				setIsSuccess(true);
-			} else {
-				alert("Something went wrong saving your RSVP. Please try again.");
-			}
-		} catch (error) {
-			console.error(error);
-			alert("Something went wrong saving your RSVP. Please try again.");
-		} finally {
-			setIsSubmitting(false);
-		}
+		rsvpMutation.mutate({
+			invite_id: inviteId,
+			attending: formAttending,
+			dietary: formDietary,
+			transit: formTransit,
+			physical_invite: formPhysicalInvite,
+			song_recommendations: formSongRecs,
+		});
 	};
 
 	// ── No invite ──
@@ -342,72 +364,120 @@ function App() {
 				<PageSection
 					id="home"
 					bg="s1"
-					className="min-h-screen flex flex-col items-center justify-center px-4 text-center pb-20 pt-10"
+					className="relative min-h-screen flex flex-col items-center justify-center px-4 text-center pb-20 pt-10 overflow-hidden"
 				>
-					<div className="max-w-2xl mx-auto">
+					{/* SVG sharpening filter definition */}
+					<svg width="0" height="0" className="absolute" aria-hidden="true">
+						<defs>
+							<filter id="hero-sharpen">
+								<feConvolveMatrix
+									order="3"
+									kernelMatrix="0 -0.5 0 -0.5 3 -0.5 0 -0.5 0"
+									preserveAlpha="true"
+								/>
+							</filter>
+						</defs>
+					</svg>
+
+					{/* Background photo with sepia + dark gradient overlay */}
+					<div className="absolute inset-0 z-0">
+						<img
+							src="/images/hero.jpeg"
+							alt=""
+							aria-hidden="true"
+							className="w-full h-full object-cover"
+							style={{
+								filter:
+									"url(#hero-sharpen) sepia(70%) contrast(0.9) brightness(1.1)",
+							}}
+						/>
+						<div
+							className="absolute inset-0"
+							style={{
+								background:
+									"radial-gradient(ellipse at 50% 40%, rgba(30,8,16,0.25) 0%, rgba(30,8,16,0.52) 100%)",
+							}}
+						/>
+					</div>
+
+					{/* Foreground content */}
+					<div className="relative z-10 max-w-2xl mx-auto px-10 py-12">
+						{/* Soft blur halo behind text */}
+						<div
+							className="absolute inset-0 -z-10"
+							style={{
+								backdropFilter: "blur(10px)",
+								WebkitBackdropFilter: "blur(10px)",
+								maskImage:
+									"radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 75%)",
+								WebkitMaskImage:
+									"radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 75%)",
+							}}
+						/>
+
 						<h1
-							className="display-title mb-4 text-5xl md:text-7xl lg:text-8xl"
-							style={{ color: "var(--heading-on-bg)" }}
+							className="display-title mb-8 text-5xl md:text-7xl lg:text-8xl"
+							style={{ color: "var(--color-blush-light)" }}
 						>
 							Ben &amp; Brit
 						</h1>
 						<p
-							className="text-xl md:text-2xl mb-8 font-light italic"
-							style={{ color: "var(--color-plum-pink)" }}
+							className="text-xl md:text-3xl mb-4 font-light"
+							style={{ color: "var(--color-blush)" }}
 						>
-							We're getting married
+							We're getting married!
 						</p>
 						<div
-							className="text-lg md:text-xl tracking-widest uppercase mb-12 font-semibold"
-							style={{ color: "var(--heading-on-bg)", opacity: 0.7 }}
+							className="text-lg md:text-xl tracking-widest uppercase mb-10 font-semibold"
+							style={{ color: "var(--color-blush-light)" }}
 						>
-							November 6th, 2026
+							on November 6th, 2026
 						</div>
 
 						{guestName ? (
-							<div className="mb-10 p-6 inline-block">
+							<div className="mb-10 inline-block">
 								{existingRsvp ? (
 									<>
 										<p
-											className="text-xl font-serif italic mb-2"
-											style={{ color: "var(--color-plum-pink)" }}
+											className="text-xl md:text-3xl font-light mb-2"
+											style={{ color: "var(--color-blush)" }}
 										>
 											Thanks for RSVPing, {guestName}!
 										</p>
-										<p className="mt-2 mb-4 opacity-70">
+										<p
+											className="mt-2 mb-4 text-xl"
+											style={{
+												color: "var(--color-blush-light)",
+											}}
+										>
 											We have you down as{" "}
 											{existingRsvp.attending
 												? "attending 🎉"
 												: "unable to make it"}
 											.
 										</p>
-										<Button
-											href="#rsvp"
-											variant="ghost"
-											size="sm"
-											onClick={() => {
-												setIsEditing(true);
-												setIsSuccess(false);
-											}}
-										>
-											Edit Response
-										</Button>
 									</>
 								) : (
 									<>
 										<p
-											className="text-xl font-serif italic mb-2"
-											style={{ color: "var(--color-plum-pink)" }}
+											className="text-xl md:text-3xl font-light mb-2"
+											style={{ color: "var(--color-blush)" }}
 										>
-											A Special Welcome to
+											A special welcome to
 										</p>
 										<h3
 											className="text-3xl font-serif"
-											style={{ color: "var(--card-heading)" }}
+											style={{ color: "var(--color-blush-light)" }}
 										>
 											{guestName}
 										</h3>
-										<p className="mt-4 opacity-70">
+										<p
+											className="mt-4 text-lg"
+											style={{
+												color: "var(--color-blush-light)",
+												opacity: 0.7,
+											}}
+										>
 											We are so excited to have you join us for our special day!
 										</p>
 									</>
@@ -416,10 +486,21 @@ function App() {
 						) : null}
 
 						<div className="flex gap-4 justify-center">
-							<Button href="#rsvp" variant="wine">
-								{existingRsvp ? "View RSVP" : "RSVP Now"}
+							<Button
+								href="#rsvp"
+								variant="wine"
+								onClick={() => {
+									setIsEditing(true);
+									setIsSuccess(false);
+								}}
+							>
+								{existingRsvp ? "Edit RSVP" : "RSVP Now"}
 							</Button>
-							<Button href="#travel" variant="ghost">
+							<Button
+								href="#travel"
+								variant="ghost"
+								className="!border-[rgba(232,207,192,0.6)] !text-[var(--color-blush-light)]"
+							>
 								Details
 							</Button>
 						</div>
@@ -453,14 +534,24 @@ function App() {
 							<p className="mb-8 font-serif text-xl tracking-wide">
 								561 Peak Road, Auckland 0875
 							</p>
-							<Button
-								href="https://maps.apple.com/?address=561+Peak+Road,+Auckland+0875"
-								variant="wine"
-								target="_blank"
-								rel="noreferrer"
-							>
-								Get Directions
-							</Button>
+							<div className="flex gap-4 justify-center">
+								<Button
+									href="https://maps.apple.com/?address=561+Peak+Road,+Auckland+0875"
+									variant="wine"
+									target="_blank"
+									rel="noreferrer"
+								>
+									Get Directions
+								</Button>
+								<Button
+									href="https://www.bridgewaterestate.co.nz/more/information-for-guests"
+									variant="ghost"
+									target="_blank"
+									rel="noreferrer"
+								>
+									Guest Information
+								</Button>
+							</div>
 						</div>
 					</div>
 				</PageSection>
@@ -612,7 +703,7 @@ function App() {
 											{isEditing && (
 												<Button
 													variant="ghost"
-													size="lg"
+													size="sm"
 													className="flex-1"
 													onClick={() => setIsEditing(false)}
 												>
@@ -621,7 +712,7 @@ function App() {
 											)}
 											<Button
 												variant="primary"
-												size="lg"
+												size="sm"
 												type="submit"
 												disabled={isSubmitting}
 												className="flex-1"

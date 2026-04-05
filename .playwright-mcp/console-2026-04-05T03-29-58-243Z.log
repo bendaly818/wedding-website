@@ -1,0 +1,140 @@
+[     305ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:20102
+[   37125ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:20102
+[   98797ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:20102
+[  185603ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx:116
+[  197414ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:20102
+[  298110ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775359983513:116
+[  308721ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:20102
+[  475344ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775360095997:116
+[  504055ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775360095997:116
+[  515573ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:20102
+[  594069ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775360273291:116
+[  605388ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:20102
+[  682269ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775360391953:116
+[  822291ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775360391953:116
+[  839883ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775360391953:116
+[  853026ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775360391953:116
+[  870806ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775360391953:116
+[  882181ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:20102
+[  920861ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775360668765:116
+[  938364ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775360668765:116
+[  956692ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775360668765:116
+[  967395ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:20102
+[ 1009260ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775360754594:116
+[ 1020561ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:20102
+[ 1084053ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775360807335:116
+[ 1103620ms] [ERROR] %o
+
+%s
+
+%s
+ NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+    at removeChild (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:15918:24)
+    at runWithFiberInDEV (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:997:72)
+    at commitDeletionEffectsOnFiber (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10190:19)
+    at recursivelyTraverseDeletionEffects (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10115:11)
+    at commitDeletionEffectsOnFiber (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10237:13)
+    at recursivelyTraverseDeletionEffects (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10115:11)
+    at commitDeletionEffectsOnFiber (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10237:13)
+    at recursivelyTraverseDeletionEffects (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10115:11)
+    at commitDeletionEffectsOnFiber (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10146:13)
+    at recursivelyTraverseDeletionEffects (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10115:11) The above error occurred in the <link> component. React will try to recreate this component tree from scratch using the error boundary you provided, CatchBoundaryImpl. @ http://localhost:3000/src/routes/__root.tsx?t=1775360807335:53
+[ 1103622ms] [WARNING] Warning: The following error wasn't caught by any route! At the very least, consider setting an 'errorComponent' in your RootRoute! @ http://localhost:3000/src/routes/__root.tsx?t=1775360807335:53
+[ 1103622ms] [WARNING] Warning: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node. @ http://localhost:3000/src/routes/__root.tsx?t=1775360807335:53
+[ 1103866ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775360807335:116
+[ 1117815ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775360807335:116
+[ 1129289ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:20102
+[ 1175740ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775360915861:116
+[ 1188621ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:20102
+[ 1249965ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:20102
+[ 1345858ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775360973781:116
+[ 1373710ms] [ERROR] %o
+
+%s
+
+%s
+ NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+    at removeChild (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:15918:24)
+    at runWithFiberInDEV (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:997:72)
+    at commitDeletionEffectsOnFiber (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10190:19)
+    at recursivelyTraverseDeletionEffects (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10115:11)
+    at commitDeletionEffectsOnFiber (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10237:13)
+    at recursivelyTraverseDeletionEffects (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10115:11)
+    at commitDeletionEffectsOnFiber (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10237:13)
+    at recursivelyTraverseDeletionEffects (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10115:11)
+    at commitDeletionEffectsOnFiber (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10146:13)
+    at recursivelyTraverseDeletionEffects (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10115:11) The above error occurred in the <link> component. React will try to recreate this component tree from scratch using the error boundary you provided, CatchBoundaryImpl. @ http://localhost:3000/src/routes/__root.tsx?t=1775360973781:53
+[ 1373711ms] [WARNING] Warning: The following error wasn't caught by any route! At the very least, consider setting an 'errorComponent' in your RootRoute! @ http://localhost:3000/src/routes/__root.tsx?t=1775360973781:53
+[ 1373711ms] [WARNING] Warning: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node. @ http://localhost:3000/src/routes/__root.tsx?t=1775360973781:53
+[ 1373894ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775360973781:116
+[ 1392462ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775360973781:116
+[ 1490127ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:20102
+[ 1533916ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775361190516:116
+[ 1546311ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:20102
+[ 1601090ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775361331949:116
+[ 1627844ms] [ERROR] %o
+
+%s
+
+%s
+ NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+    at removeChild (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:15918:24)
+    at runWithFiberInDEV (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:997:72)
+    at commitDeletionEffectsOnFiber (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10190:19)
+    at recursivelyTraverseDeletionEffects (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10115:11)
+    at commitDeletionEffectsOnFiber (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10237:13)
+    at recursivelyTraverseDeletionEffects (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10115:11)
+    at commitDeletionEffectsOnFiber (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10237:13)
+    at recursivelyTraverseDeletionEffects (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10115:11)
+    at commitDeletionEffectsOnFiber (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10146:13)
+    at recursivelyTraverseDeletionEffects (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:10115:11) The above error occurred in the <link> component. React will try to recreate this component tree from scratch using the error boundary you provided, CatchBoundaryImpl. @ http://localhost:3000/src/routes/__root.tsx?t=1775361331949:53
+[ 1627844ms] [WARNING] Warning: The following error wasn't caught by any route! At the very least, consider setting an 'errorComponent' in your RootRoute! @ http://localhost:3000/src/routes/__root.tsx?t=1775361331949:53
+[ 1627845ms] [WARNING] Warning: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node. @ http://localhost:3000/src/routes/__root.tsx?t=1775361331949:53
+[ 1628067ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; [vite] hot updated: virtual:cloudflare/worker-entry @ http://localhost:3000/src/routes/__root.tsx?t=1775361331949:116
+[ 1640727ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:20102
+[ 1724410ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:20102
+[ 1724457ms] [ERROR] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch 
+
+  ...
+    <SafeFragment getResetKey={function getResetKey} errorComponent={function ErrorComponent} onCatch={function onCatch}>
+      <SafeFragment fallback={function fallback}>
+        <MatchInnerImpl matchId="__root__/">
+          <OutletImpl>
+            <Suspense fallback={null}>
+              <MatchImpl matchId="//">
+                <SafeFragment>
+                  <SafeFragment fallback={null}>
+                    <SafeFragment getResetKey={function getResetKey} errorComponent={function ErrorComponent} ...>
+                      <SafeFragment fallback={function fallback}>
+                        <MatchInnerImpl matchId="//">
+                          <Lazy>
+                            <App>
+                              <div
+                                className="fullscreen-overlay"
+                                style={{background:"radial-gra..."}}
++                               data-tsd-source="/src/routes/index.tsx:335:4"
+-                               data-tsd-source="/src/routes/index.tsx:313:4"
+                              >
+                                <div
+                                  className="font-serif italic text-xl animate-pulse"
+                                  style={{color:"var(--colo..."}}
++                                 data-tsd-source="/src/routes/index.tsx:342:5"
+-                                 data-tsd-source="/src/routes/index.tsx:320:5"
+                                >
++                                 Opening your invitation...
+                  ...
+ @ http://localhost:3000/src/routes/__root.tsx?t=1775361426053:53
+[ 1725929ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:20102
+[ 1740680ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:20102
+[ 1754144ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:20102
+[ 1760182ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=8f6f4eb8:20102

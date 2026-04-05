@@ -13,7 +13,10 @@ const variantStyle: Record<Variant, React.CSSProperties> = {
 		borderColor: "var(--outline-btn-color)",
 		color: "var(--outline-btn-color)",
 	},
-	ghost: { borderColor: "var(--card-border)", color: "var(--heading-on-bg)" },
+	ghost: {
+		borderColor: "var(--card-border)",
+		color: "var(--heading-on-bg)",
+	},
 };
 
 const sizeClass: Record<Size, string> = {

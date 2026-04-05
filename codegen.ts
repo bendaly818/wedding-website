@@ -3,9 +3,9 @@ import type { CodegenConfig } from '@graphql-codegen/cli';
 const config: CodegenConfig = {
   schema: [
     {
-      [`${process.env.VITE_SUPABASE_URL}/graphql/v1`]: {
+      [`${import.meta.env.VITE_SUPABASE_URL}/graphql/v1`]: {
         headers: {
-          apikey: process.env.VITE_SUPABASE_PUBLISHABLE_KEY as string,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string,
         },
       },
     },

@@ -1,0 +1,22 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - navigation [ref=e3]:
+      - heading "B & B" [level=2] [ref=e4]:
+        - link "B & B" [ref=e5] [cursor=pointer]:
+          - /url: /
+      - generic [ref=e6]:
+        - link "Welcome" [ref=e7] [cursor=pointer]:
+          - /url: "#welcome"
+        - link "Schedule" [ref=e8] [cursor=pointer]:
+          - /url: "#schedule"
+        - link "Travel" [ref=e9] [cursor=pointer]:
+          - /url: "#travel"
+        - link "RSVP" [ref=e10] [cursor=pointer]:
+          - /url: "#rsvp"
+  - generic [ref=e12]: Opening your invitation...
+  - contentinfo [ref=e13]:
+    - generic [ref=e14]:
+      - paragraph [ref=e15]: We can't wait to celebrate with you!
+      - paragraph [ref=e16]: November 6th, 2026 - Bridgewater Estate
+  - button "Open TanStack Devtools" [ref=e17] [cursor=pointer]:
+    - img "TanStack Devtools" [ref=e18]
