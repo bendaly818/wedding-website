@@ -11,3 +11,5 @@ dist-ssr
 __unconfig*
 todos.json
 .dev.vars
+.playwright
+.playwright-cli

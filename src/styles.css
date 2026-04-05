@@ -158,7 +158,8 @@ body:has(.envelope-scene:not(.is-exiting)) {
   50%       { transform: translateY(-8px); }
 }
 
-.envelope-outer {
+/* Container: sizing, shadow, float animation — no overflow clipping */
+.envelope-container {
   position: relative;
   width: min(420px, 90vw);
   aspect-ratio: 1.6;
@@ -170,20 +171,28 @@ body:has(.envelope-scene:not(.is-exiting)) {
   border-radius: 8px;
 }
 
-.envelope-outer.is-animating {
+.envelope-container.is-animating {
   animation: none;
 }
 
-/* z:1 — solid back face */
-.envelope-body-back {
+/* Outer: clips the fold triangles with rounded corners — no stacking context issues
+   because letter/flap/seal are siblings, not children */
+.envelope-outer {
   position: absolute;
   inset: 0;
   border-radius: 8px;
+  overflow: hidden;
+}
+
+/* z:1 inside wrapper — solid back face */
+.envelope-body-back {
+  position: absolute;
+  inset: 0;
   background: #f8f4ef;
   z-index: 1;
 }
 
-/* Solid triangles at z:3 — sit in front of the letter, hide it when sealed */
+/* Solid triangles — sit inside the wrapper, clip-path handles the shape */
 .envelope-fold-left,
 .envelope-fold-right,
 .envelope-fold-bottom {
@@ -260,7 +269,6 @@ body:has(.envelope-scene:not(.is-exiting)) {
 
 .envelope-letter.is-rising {
   transform: translateY(-88%);
-  z-index: 7;
 }
 
 .envelope-letter-title {
@@ -298,6 +306,10 @@ body:has(.envelope-scene:not(.is-exiting)) {
 }
 
 /* Flap container — drop-shadow cast down onto body to show lift */
+.envelope-flap.is-open {
+  z-index: 1;
+}
+
 .envelope-flap {
   position: absolute;
   top: 0;

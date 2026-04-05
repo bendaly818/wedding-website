@@ -136,11 +136,11 @@ function EnvelopeOverlay({
 		>
 			<p className="envelope-tagline">You&apos;re Invited</p>
 
-			<div className={`envelope-outer${isAnimating ? " is-animating" : ""}`}>
-				{/* z:1 — back face of envelope */}
-				<div className="envelope-body-back" />
-
-				{/* z:2 → z:7 — letter rises between the two body layers */}
+			{/* Container: provides positioning context for letter/flap/seal without overflow clipping */}
+			<div
+				className={`envelope-container${isAnimating ? " is-animating" : ""}`}
+			>
+				{/* Letter — sibling of envelope-outer, free to rise above it */}
 				<div className={`envelope-letter${isAnimating ? " is-rising" : ""}`}>
 					<p className="envelope-letter-title">Ben &amp; Brit</p>
 					<div className="envelope-letter-divider" />
@@ -148,36 +148,45 @@ function EnvelopeOverlay({
 					<p className="envelope-letter-venue">Bridgewater Estate</p>
 				</div>
 
-				{/* z:3 — solid fold triangles over the letter */}
-				<div className="envelope-fold-left" />
-				<div className="envelope-fold-right" />
-				<div className="envelope-fold-bottom">
-					{guestName && (
-						<div className="envelope-address">
-							<span className="font-serif text-sm" style={{ color: "rgba(107,21,53,0.5)" }}>
-								{guestName}
-							</span>
-						</div>
-					)}
+				{/* envelope-outer: overflow:hidden + border-radius — only contains body elements */}
+				<div className="envelope-outer">
+					<div className="envelope-body-back" />
+					<div className="envelope-fold-left" />
+					<div className="envelope-fold-right" />
+					<div className="envelope-fold-bottom">
+						{guestName && (
+							<div className="envelope-address">
+								<span
+									className="font-serif text-sm"
+									style={{ color: "rgba(107,21,53,0.5)" }}
+								>
+									{guestName}
+								</span>
+							</div>
+						)}
+					</div>
+					<div className="envelope-seams" />
 				</div>
-				{/* Fold seam lines on top of everything */}
-				<div className="envelope-seams" />
 
-				{/* Flap — two faces for visible 3D open */}
+				{/* Flap — sibling of envelope-outer, unaffected by its overflow */}
 				<div className={`envelope-flap${isAnimating ? " is-open" : ""}`}>
 					<div className="envelope-flap-front" />
 					<div className="envelope-flap-back" />
 				</div>
 
-				{/* Wax seal SVG — organic blob shape */}
+				{/* Wax seal */}
 				<div className={`envelope-seal${isAnimating ? " is-broken" : ""}`}>
-					<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" width="72" height="72" aria-hidden="true">
-						{/* Organic wax blob — slightly irregular, like real pooled wax */}
+					<svg
+						viewBox="0 0 80 80"
+						xmlns="http://www.w3.org/2000/svg"
+						width="72"
+						height="72"
+						aria-hidden="true"
+					>
 						<path
 							d="M40,6 C49,5 58,9 63,16 C68,22 70,30 68,38 C67,44 64,49 68,54 C72,59 72,67 66,72 C60,77 52,76 46,73 C42,71 39,73 35,74 C29,76 21,75 16,70 C11,65 11,57 14,51 C17,46 14,40 13,35 C11,28 13,19 19,14 C25,8 33,7 40,6 Z"
 							fill="#7a1535"
 						/>
-						{/* Subtle inner highlight — top-left, like light catching wax surface */}
 						<path
 							d="M40,6 C49,5 58,9 63,16 C68,22 70,30 68,38 C67,44 64,49 68,54 C72,59 72,67 66,72"
 							fill="none"
@@ -185,12 +194,25 @@ function EnvelopeOverlay({
 							strokeWidth="6"
 							strokeLinecap="round"
 						/>
-						{/* Pressed ring — the impression left by a seal stamp */}
-						<circle cx="40" cy="40" r="24" fill="none" stroke="rgba(255,210,185,0.2)" strokeWidth="1" />
-						<circle cx="40" cy="40" r="19" fill="none" stroke="rgba(255,210,185,0.15)" strokeWidth="0.7" />
-						{/* Monogram */}
+						<circle
+							cx="40"
+							cy="40"
+							r="24"
+							fill="none"
+							stroke="rgba(255,210,185,0.2)"
+							strokeWidth="1"
+						/>
+						<circle
+							cx="40"
+							cy="40"
+							r="19"
+							fill="none"
+							stroke="rgba(255,210,185,0.15)"
+							strokeWidth="0.7"
+						/>
 						<text
-							x="40" y="43"
+							x="40"
+							y="43"
 							textAnchor="middle"
 							dominantBaseline="middle"
 							fontFamily="Georgia, 'Times New Roman', serif"
@@ -198,7 +220,9 @@ function EnvelopeOverlay({
 							fontWeight="400"
 							fill="rgba(255,230,210,0.88)"
 							letterSpacing="2"
-						>B&amp;B</text>
+						>
+							B&amp;B
+						</text>
 					</svg>
 				</div>
 			</div>
@@ -712,7 +736,6 @@ function App() {
 											)}
 											<Button
 												variant="primary"
-												size="sm"
 												type="submit"
 												disabled={isSubmitting}
 												className="flex-1"
