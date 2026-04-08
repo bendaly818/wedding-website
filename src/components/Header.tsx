@@ -3,9 +3,9 @@ import { useState } from "react";
 
 const NAV_LINKS = [
 	{ href: "#welcome", label: "Welcome" },
-	{ href: "#schedule", label: "Schedule" },
-	{ href: "#travel", label: "Travel" },
 	{ href: "#rsvp", label: "RSVP" },
+	{ href: "#travel", label: "Travel" },
+	{ href: "#attire", label: "Attire" },
 ];
 
 export default function Header() {

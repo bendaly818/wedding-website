@@ -106,9 +106,11 @@ function ComingSoon() {
 function EnvelopeOverlay({
 	guestName,
 	onOpened,
+	onExiting,
 }: {
 	guestName: string | null;
 	onOpened: () => void;
+	onExiting: () => void;
 }) {
 	const [phase, setPhase] = useState<"sealed" | "opening" | "exiting">(
 		"sealed",
@@ -117,9 +119,12 @@ function EnvelopeOverlay({
 	const handleOpen = useCallback(() => {
 		if (phase !== "sealed") return;
 		setPhase("opening");
-		setTimeout(() => setPhase("exiting"), 1200);
-		setTimeout(onOpened, 1800);
-	}, [phase, onOpened]);
+		setTimeout(() => {
+			setPhase("exiting");
+			onExiting();
+		}, 1200);
+		setTimeout(onOpened, 2000);
+	}, [phase, onOpened, onExiting]);
 
 	const isAnimating = phase !== "sealed";
 
@@ -304,13 +309,19 @@ function App() {
 	const [inviteId, setInviteId] = useState<string | null>(urlId ?? null);
 	const [idResolved, setIdResolved] = useState(!!urlId);
 	const [envelopeOpened, setEnvelopeOpened] = useState(false);
+	// mainVisible drives the site fade-in; true immediately for return visitors
+	const [mainVisible, setMainVisible] = useState(false);
 
 	useEffect(() => {
 		const id = urlId ?? readStoredId();
 		if (id) persistId(id);
 		setInviteId(id ?? null);
 		setIdResolved(true);
-		if (id) setEnvelopeOpened(hasOpenedEnvelope(id));
+		const alreadyOpened = id ? hasOpenedEnvelope(id) : false;
+		if (alreadyOpened) {
+			setEnvelopeOpened(true);
+			setMainVisible(true); // skip fade-in for return visitors
+		}
 	}, [urlId]);
 
 	// Fetch invite
@@ -396,13 +407,17 @@ function App() {
 			physical_invite: existingRsvp?.physical_invite ?? null,
 			song_recommendations: existingRsvp?.song_recommendations ?? "",
 		});
-		setIsEditing(true);
+		existingRsvp && setIsEditing(true);
 	}, [form, existingRsvp]);
 
 	const handleEnvelopeOpened = useCallback(() => {
 		if (inviteId) markEnvelopeOpened(inviteId);
 		setEnvelopeOpened(true);
 	}, [inviteId]);
+
+	const handleEnvelopeExiting = useCallback(() => {
+		setMainVisible(true);
+	}, []);
 
 	// ── No invite ──
 	if (stage === "no-invite") return <ComingSoon />;
@@ -434,10 +449,16 @@ function App() {
 				<EnvelopeOverlay
 					guestName={guestName}
 					onOpened={handleEnvelopeOpened}
+					onExiting={handleEnvelopeExiting}
 				/>
 			)}
 
-			<main>
+			<main
+				style={{
+					opacity: mainVisible ? 1 : 0,
+					transition: "opacity 0.8s ease",
+				}}
+			>
 				{/* ── HERO ── */}
 				<PageSection
 					id="home"
@@ -537,27 +558,29 @@ function App() {
 									</>
 								) : (
 									<>
-										<p
-											className="text-xl md:text-3xl font-light mb-2"
-											style={{ color: "var(--color-blush)" }}
-										>
-											A special welcome to
-										</p>
 										<h3
-											className="text-3xl font-serif"
-											style={{ color: "var(--color-blush-light)" }}
+											className="text-xl md:text-3xl font-serif mb-4 font-light"
+							style={{ color: "var(--color-blush)" }}
 										>
 											{guestName}
 										</h3>
 										<p
-											className="mt-4 text-lg"
+									className="mt-2 mb-4 text-lg md:text-xl"
 											style={{
 												color: "var(--color-blush-light)",
-												opacity: 0.7,
 											}}
 										>
 											We are so excited to have you join us for our special day!
 										</p>
+										{invite?.message && (
+											<p 
+											className="mt-2 mb-4 text-lg md:text-xl"
+											style={{
+												color: "var(--color-blush-light)",
+											}}>
+												{invite.message}
+											</p>
+										)}
 									</>
 								)}
 							</div>
@@ -828,8 +851,28 @@ function App() {
 									target="_blank"
 									rel="noreferrer"
 								>
-									Guest Information
+									Venue Information
 								</Button>
+							</div>
+
+							<div className="mt-10 text-left rounded-xl p-6">
+								<h4
+									className="display-title text-xl mb-1"
+									style={{ color: "var(--heading-on-bg)" }}
+								>
+									Getting There
+								</h4>
+								<p className="font-serif opacity-70 mb-4">
+									If you're not using the shuttle service that we will provide and you're not driving yourself - a quick note that Uber does not operate in the area of the wedding and you need to pre-book a taxi or shuttle.
+								</p>
+								<ul className="font-serif space-y-1 opacity-80 text-sm">
+									<li><span className="font-semibold">Liberty Shuttles</span> — <a href="tel:0800995511" className="underline">0800 99 55 11</a></li>
+									<li><span className="font-semibold">Huapai Transfers</span> — <a href="tel:02049527222" className="underline">0204 952 722</a></li>
+									<li><span className="font-semibold">Nor West Taxis</span> — <a href="tel:094129335" className="underline">09 412 9335</a></li>
+									<li><span className="font-semibold">Budget Taxi</span> — <a href="tel:098494000" className="underline">09 849 4000</a></li>
+									<li><span className="font-semibold">Corporate Cabs</span> — <a href="tel:0800789789" className="underline">0800 789 789</a></li>
+									<li><span className="font-semibold">Quick Shuttle</span> — <a href="mailto:info@quickshuttle.co.nz" className="underline">info@quickshuttle.co.nz</a></li>
+								</ul>
 							</div>
 						</div>
 					</div>
