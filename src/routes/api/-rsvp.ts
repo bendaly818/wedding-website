@@ -1,14 +1,6 @@
 import { graphql } from "#/gql";
+import { RsvpInsertInput, RsvpUpdateInput } from "#/gql/graphql";
 import { supabaseGraphqlClient } from "#/lib/supabase-graphql";
-
-type RsvpInput = {
-	invite_id: string;
-	attending: string;
-	dietary?: string;
-	transit?: boolean | null;
-	physical_invite?: boolean | null;
-	song_recommendations?: string;
-};
 
 const GET_RSVP_QUERY = graphql(`
   query GetRsvp($invite_id: UUID!) {
@@ -79,11 +71,11 @@ export async function submitRsvp({
 	transit,
 	physical_invite,
 	song_recommendations,
-}: RsvpInput) {
+}: RsvpInsertInput) {
 	try {
 		await supabaseGraphqlClient.request(INSERT_RSVP_MUTATION, {
 			invite_id,
-			attending: attending === "yes",
+			attending: !!attending,
 			dietary: dietary || null,
 			transit: transit ?? null,
 			physical_invite: physical_invite ?? null,
@@ -103,13 +95,13 @@ export async function updateRsvp({
 	transit,
 	physical_invite,
 	song_recommendations,
-}: RsvpInput) {
+}: RsvpUpdateInput) {
 	try {
 		const data: any = await supabaseGraphqlClient.request(
 			UPDATE_RSVP_MUTATION,
 			{
 				invite_id,
-				attending: attending === "yes",
+				attending: !!attending,
 				dietary: dietary || null,
 				transit: transit ?? null,
 				physical_invite: physical_invite ?? null,

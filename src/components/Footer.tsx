@@ -5,7 +5,7 @@ export default function Footer() {
 				<p className="m-0 font-serif text-lg">
 					We can't wait to celebrate with you!
 				</p>
-				<p className="m-0 text-sm">November 6th, 2026 - Bridgewater Estate</p>
+				<p className="m-0 text-sm">November 6th, 2026 — Bridgewater Estate</p>
 			</div>
 		</footer>
 	);

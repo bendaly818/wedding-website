@@ -32,7 +32,14 @@ export async function getInvite(id: string) {
 		}
 		return { success: true, invite };
 	} catch (error) {
-		console.error("Failed to fetch invite:", error);
-		return { success: false, error: "Failed to fetch invite details." };
+		console.error(
+			"Failed to fetch invite:",
+			error instanceof Error ? error.message : String(error),
+		);
+		return {
+			success: false,
+			error: "Failed to fetch invite details.",
+			errorDetails: error instanceof Error ? error.message : String(error),
+		};
 	}
 }

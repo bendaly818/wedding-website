@@ -1,7 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "@tanstack/react-form";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { z } from "zod";
+import { RsvpInsertInput } from "#/gql/graphql";
 import Button from "../components/ui/Button";
 import FormField from "../components/ui/FormField";
 import PageSection from "../components/ui/PageSection";
@@ -122,9 +124,9 @@ function EnvelopeOverlay({
 	const isAnimating = phase !== "sealed";
 
 	return (
-		<div
+		<button
 			className={`fullscreen-overlay envelope-scene${phase === "exiting" ? " is-exiting" : ""}`}
-			role="button"
+			type="button"
 			tabIndex={0}
 			aria-label="Open your invitation"
 			onClick={phase === "sealed" ? handleOpen : undefined}
@@ -226,7 +228,67 @@ function EnvelopeOverlay({
 					</svg>
 				</div>
 			</div>
-		</div>
+		</button>
+	);
+}
+
+// ── WeddingAttire ─────────────────────────────────────────────────
+function WeddingAttire() {
+	return (
+		<PageSection id="attire" bg="s1">
+			<div className="page-wrap text-center">
+				<h2
+					className="display-title text-4xl mb-3"
+					style={{ color: "var(--heading-on-bg)" }}
+				>
+					Wedding Attire
+				</h2>
+				<p
+					className="font-serif text-2xl mb-14"
+					style={{ color: "var(--color-plum-pink)" }}
+				>
+					Cocktail
+				</p>
+
+				<img
+					src="/images/attire.png"
+					alt="Wedding attire examples"
+					className="max-w-4xl mx-auto mb-10 w-full"
+				/>
+
+				<div className="flex flex-col sm:flex-row justify-center gap-10 sm:gap-16 max-w-2xl mx-auto">
+					{/* ── Women ── */}
+					<div className="flex-1 text-center">
+						<h4
+							className="font-serif text-xl font-semibold mb-3"
+							style={{ color: "var(--heading-on-bg)" }}
+						>
+							For Women
+						</h4>
+						<p className="text-sm leading-relaxed opacity-70 max-w-[400px] mx-auto">
+							Cocktail, midi, or maxi dresses are perfect. As some areas of the
+							venue have uneven ground, we recommend wearing block heels,
+							wedges, or flats instead of stilettos.
+						</p>
+					</div>
+
+					{/* ── Men ── */}
+					<div className="flex-1 text-center">
+						<h4
+							className="font-serif text-xl font-semibold mb-3"
+							style={{ color: "var(--heading-on-bg)" }}
+						>
+							For Men
+						</h4>
+						<p className="text-sm leading-relaxed opacity-70 max-w-[400px] mx-auto">
+							A tailored blazer with trousers or a full suit is ideal. Dress
+							shirts or button-downs are encouraged, and ties are completely
+							optional — feel free to keep things polished yet relaxed.
+						</p>
+					</div>
+				</div>
+			</div>
+		</PageSection>
 	);
 }
 
@@ -285,70 +347,62 @@ function App() {
 	})();
 
 	const [isEditing, setIsEditing] = useState(false);
-	const [isSuccess, setIsSuccess] = useState(false);
-	const [formAttending, setFormAttending] = useState<"yes" | "no" | "">("");
-	const [formDietary, setFormDietary] = useState("");
-	const [formTransit, setFormTransit] = useState<boolean | null>(null);
-	const [formPhysicalInvite, setFormPhysicalInvite] = useState<boolean | null>(
-		null,
-	);
-	const [formSongRecs, setFormSongRecs] = useState("");
 
-	useEffect(() => {
-		const showingForm =
-			stage === "site" && !isSuccess && (isEditing || !existingRsvp);
-		if (!showingForm) return;
-		setFormAttending(
-			existingRsvp ? (existingRsvp.attending ? "yes" : "no") : "",
-		);
-		setFormDietary(existingRsvp?.dietary ?? "");
-		setFormTransit(existingRsvp?.transit ?? null);
-		setFormPhysicalInvite(existingRsvp?.physical_invite ?? null);
-		setFormSongRecs(existingRsvp?.song_recommendations ?? "");
-	}, [isEditing, isSuccess, stage, existingRsvp]);
-
-	const rsvpMutation = useMutation({
-		mutationFn: (input: Parameters<typeof submitRsvp>[0]) =>
-			existingRsvp ? updateRsvp(input) : submitRsvp(input),
-		onSuccess: (result, variables) => {
-			if (!result.success) {
+	const form = useForm({
+		defaultValues:
+			rsvpQuery.data ??
+			({
+				attending: null as boolean | null,
+				dietary: "",
+				transit: null as boolean | null,
+				physical_invite: null as boolean | null,
+				song_recommendations: "",
+			} as RsvpInsertInput),
+		onSubmit: async ({ value }) => {
+			if (!inviteId) return;
+			try {
+				const result = await (existingRsvp ? updateRsvp : submitRsvp)({
+					invite_id: inviteId,
+					attending: value.attending,
+					dietary: value.dietary,
+					transit: value.transit,
+					physical_invite: value.physical_invite,
+					song_recommendations: value.song_recommendations,
+				});
+				if (!result.success) {
+					alert("Something went wrong saving your RSVP. Please try again.");
+					return;
+				}
+				queryClient.setQueryData(["rsvp", inviteId], {
+					attending: value.attending,
+					dietary: value.dietary,
+					transit: value.transit,
+					physical_invite: value.physical_invite,
+					song_recommendations: value.song_recommendations,
+				});
+				setIsEditing(false);
+			} catch (error) {
+				console.error(error);
 				alert("Something went wrong saving your RSVP. Please try again.");
-				return;
 			}
-			queryClient.setQueryData(["rsvp", inviteId], {
-				attending: variables.attending === "yes",
-				dietary: variables.dietary,
-				transit: variables.transit,
-				physical_invite: variables.physical_invite,
-				song_recommendations: variables.song_recommendations,
-			});
-			setIsEditing(false);
-			setIsSuccess(true);
-		},
-		onError: (error) => {
-			console.error(error);
-			alert("Something went wrong saving your RSVP. Please try again.");
 		},
 	});
-	const isSubmitting = rsvpMutation.isPending;
+
+	const startEditing = useCallback(() => {
+		form.reset({
+			attending: existingRsvp?.attending,
+			dietary: existingRsvp?.dietary ?? "",
+			transit: existingRsvp?.transit ?? null,
+			physical_invite: existingRsvp?.physical_invite ?? null,
+			song_recommendations: existingRsvp?.song_recommendations ?? "",
+		});
+		setIsEditing(true);
+	}, [form, existingRsvp]);
 
 	const handleEnvelopeOpened = useCallback(() => {
 		if (inviteId) markEnvelopeOpened(inviteId);
 		setEnvelopeOpened(true);
 	}, [inviteId]);
-
-	const handleRsvpSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		if (!inviteId) return;
-		rsvpMutation.mutate({
-			invite_id: inviteId,
-			attending: formAttending,
-			dietary: formDietary,
-			transit: formTransit,
-			physical_invite: formPhysicalInvite,
-			song_recommendations: formSongRecs,
-		});
-	};
 
 	// ── No invite ──
 	if (stage === "no-invite") return <ComingSoon />;
@@ -446,13 +500,13 @@ function App() {
 							Ben &amp; Brit
 						</h1>
 						<p
-							className="text-xl md:text-3xl mb-4 font-light"
+							className="text-xl md:text-3xl font-serif mb-4 font-light"
 							style={{ color: "var(--color-blush)" }}
 						>
 							We're getting married!
 						</p>
 						<div
-							className="text-lg md:text-xl tracking-widest uppercase mb-10 font-semibold"
+							className="text-lg md:text-xl mb-10"
 							style={{ color: "var(--color-blush-light)" }}
 						>
 							on November 6th, 2026
@@ -463,13 +517,13 @@ function App() {
 								{existingRsvp ? (
 									<>
 										<p
-											className="text-xl md:text-3xl font-light mb-2"
+											className="text-xl md:text-3xl font-serif mb-4"
 											style={{ color: "var(--color-blush)" }}
 										>
 											Thanks for RSVPing, {guestName}!
 										</p>
 										<p
-											className="mt-2 mb-4 text-xl"
+											className="mt-2 mb-4 text-lg md:text-xl"
 											style={{
 												color: "var(--color-blush-light)",
 											}}
@@ -510,14 +564,7 @@ function App() {
 						) : null}
 
 						<div className="flex gap-4 justify-center">
-							<Button
-								href="#rsvp"
-								variant="wine"
-								onClick={() => {
-									setIsEditing(true);
-									setIsSuccess(false);
-								}}
-							>
+							<Button href="#rsvp" variant="wine" onClick={startEditing}>
 								{existingRsvp ? "Edit RSVP" : "RSVP Now"}
 							</Button>
 							<Button
@@ -527,55 +574,6 @@ function App() {
 							>
 								Details
 							</Button>
-						</div>
-					</div>
-				</PageSection>
-
-				{/* ── TRAVEL & VENUE ── */}
-				<PageSection id="travel" bg="s2">
-					<div className="page-wrap text-center">
-						<h2
-							className="display-title text-4xl mb-12"
-							style={{ color: "var(--heading-on-bg)" }}
-						>
-							Travel &amp; Venue
-						</h2>
-						<div className="max-w-2xl mx-auto text-center">
-							<img
-								src="/images/bridgewater.jpg"
-								alt="Bridgewater Estate Venue"
-								className="w-full h-64 object-cover rounded-xl mb-8 shadow-md"
-							/>
-							<h3
-								className="display-title text-3xl mb-4"
-								style={{ color: "var(--heading-on-bg)" }}
-							>
-								Bridgewater Estate
-							</h3>
-							<p className="text-lg mb-2 opacity-70">
-								Helensville, Auckland, New Zealand
-							</p>
-							<p className="mb-8 font-serif text-xl tracking-wide">
-								561 Peak Road, Auckland 0875
-							</p>
-							<div className="flex gap-4 justify-center">
-								<Button
-									href="https://maps.apple.com/?address=561+Peak+Road,+Auckland+0875"
-									variant="wine"
-									target="_blank"
-									rel="noreferrer"
-								>
-									Get Directions
-								</Button>
-								<Button
-									href="https://www.bridgewaterestate.co.nz/more/information-for-guests"
-									variant="ghost"
-									target="_blank"
-									rel="noreferrer"
-								>
-									Guest Information
-								</Button>
-							</div>
 						</div>
 					</div>
 				</PageSection>
@@ -604,13 +602,7 @@ function App() {
 										Your RSVP has been sent. We can't wait to celebrate with
 										you!
 									</p>
-									<Button
-										variant="ghost"
-										onClick={() => {
-											setIsEditing(true);
-											setIsSuccess(false);
-										}}
-									>
+									<Button variant="ghost" onClick={startEditing}>
 										Edit Response
 									</Button>
 								</div>
@@ -629,130 +621,222 @@ function App() {
 									</p>
 									<form
 										className="flex flex-col gap-6 text-left"
-										onSubmit={handleRsvpSubmit}
+										onSubmit={(e) => {
+											e.preventDefault();
+											e.stopPropagation();
+											form.handleSubmit();
+										}}
 									>
-										<div>
-											<label className="block text-sm font-bold uppercase tracking-wider mb-2">
-												Will you be attending?
-											</label>
-											<div className="flex gap-4">
-												<RadioCard
-													name="attending"
-													value="yes"
-													label="Yes, wouldn't miss it!"
-													checked={formAttending === "yes"}
-													onChange={() => setFormAttending("yes")}
-													required
-												/>
-												<RadioCard
-													name="attending"
-													value="no"
-													label="Sadly, cannot make it"
-													checked={formAttending === "no"}
-													onChange={() => setFormAttending("no")}
-													required
-												/>
-											</div>
-										</div>
-
-										<FormField
-											label="Dietary Requirements"
-											name="dietary"
-											value={formDietary}
-											onChange={(e) => setFormDietary(e.target.value)}
-											placeholder="Please let us know if you have any allergies or dietary restrictions..."
-										/>
-
-										<div>
-											<label className="block text-sm font-bold uppercase tracking-wider mb-2">
-												Would you like transit to &amp; from the venue?
-											</label>
-											<p className="text-sm opacity-60 mb-3">
-												We're arranging transport from a central Auckland
-												location.
-											</p>
-											<div className="flex gap-4">
-												<RadioCard
-													name="transit"
-													value="yes"
-													label="Yes please!"
-													checked={formTransit === true}
-													onChange={() => setFormTransit(true)}
-												/>
-												<RadioCard
-													name="transit"
-													value="no"
-													label="No thanks"
-													checked={formTransit === false}
-													onChange={() => setFormTransit(false)}
-												/>
-											</div>
-										</div>
-
-										<div>
-											<label className="block text-sm font-bold uppercase tracking-wider mb-2">
-												Would you like a physical invite?
-											</label>
-											<p className="text-sm opacity-60 mb-3">
-												Something to put on the fridge and remember the day.
-											</p>
-											<div className="flex gap-4">
-												<RadioCard
-													name="physical_invite"
-													value="yes"
-													label="Yes please!"
-													checked={formPhysicalInvite === true}
-													onChange={() => setFormPhysicalInvite(true)}
-												/>
-												<RadioCard
-													name="physical_invite"
-													value="no"
-													label="No thanks"
-													checked={formPhysicalInvite === false}
-													onChange={() => setFormPhysicalInvite(false)}
-												/>
-											</div>
-										</div>
-
-										<FormField
-											label="What songs will get you on the dance floor?"
-											hint="Bribe the DJ with your best tunes. No judgement (okay, maybe a little)."
-											name="song_recommendations"
-											value={formSongRecs}
-											onChange={(e) => setFormSongRecs(e.target.value)}
-											placeholder="ABBA, Beyoncé, that one song you're embarrassed about..."
-										/>
-
-										<div className="flex gap-4 mt-4">
-											{isEditing && (
-												<Button
-													variant="ghost"
-													size="sm"
-													className="flex-1"
-													onClick={() => setIsEditing(false)}
-												>
-													Cancel
-												</Button>
+										<form.Field name="attending">
+											{(field) => (
+												<div>
+													<label
+														htmlFor={field.name}
+														className="block text-sm font-bold uppercase tracking-wider mb-2"
+													>
+														Will you be attending?
+													</label>
+													<div className="flex gap-4">
+														<RadioCard
+															name="attending"
+															value="yes"
+															label="Yes, wouldn't miss it!"
+															checked={field.state.value === true}
+															onChange={() => field.handleChange(true)}
+															required
+														/>
+														<RadioCard
+															name="attending"
+															value="no"
+															label="Sadly, cannot make it"
+															checked={field.state.value === false}
+															onChange={() => field.handleChange(false)}
+															required
+														/>
+													</div>
+												</div>
 											)}
-											<Button
-												variant="primary"
-												type="submit"
-												disabled={isSubmitting}
-												className="flex-1"
-											>
-												{isSubmitting
-													? "Saving..."
-													: isEditing
-														? "Update RSVP"
-														: "Send RSVP"}
-											</Button>
-										</div>
+										</form.Field>
+
+										<form.Field name="dietary">
+											{(field) => (
+												<FormField
+													label="Dietary Requirements"
+													name="dietary"
+													value={field.state.value ?? ""}
+													onChange={(e) => field.handleChange(e.target.value)}
+													placeholder="Please let us know if you have any allergies or dietary restrictions..."
+												/>
+											)}
+										</form.Field>
+
+										<form.Field name="transit">
+											{(field) => (
+												<div>
+													<label
+														htmlFor={field.name}
+														className="block text-sm font-bold uppercase tracking-wider mb-2"
+													>
+														Would you like transit to &amp; from the venue?
+													</label>
+													<p className="text-sm opacity-60 mb-3">
+														We're arranging transport from a central Auckland
+														location.
+													</p>
+													<div className="flex gap-4">
+														<RadioCard
+															name="transit"
+															value="yes"
+															label="Yes please!"
+															checked={field.state.value === true}
+															onChange={() => field.handleChange(true)}
+														/>
+														<RadioCard
+															name="transit"
+															value="no"
+															label="No thanks"
+															checked={field.state.value === false}
+															onChange={() => field.handleChange(false)}
+														/>
+													</div>
+												</div>
+											)}
+										</form.Field>
+
+										<form.Field name="physical_invite">
+											{(field) => (
+												<div>
+													<label
+														htmlFor={field.name}
+														className="block text-sm font-bold uppercase tracking-wider mb-2"
+													>
+														Would you like a physical invite?
+													</label>
+													<p className="text-sm opacity-60 mb-3">
+														Something to put on the fridge and remember the day.
+													</p>
+													<div className="flex gap-4">
+														<RadioCard
+															name="physical_invite"
+															value="yes"
+															label="Yes please!"
+															checked={field.state.value === true}
+															onChange={() => field.handleChange(true)}
+														/>
+														<RadioCard
+															name="physical_invite"
+															value="no"
+															label="No thanks"
+															checked={field.state.value === false}
+															onChange={() => field.handleChange(false)}
+														/>
+													</div>
+												</div>
+											)}
+										</form.Field>
+
+										<form.Field name="song_recommendations">
+											{(field) => (
+												<FormField
+													label="What songs will get you on the dance floor?"
+													hint="Bribe the DJ with your best tunes. No judgement (okay, maybe a little)."
+													name="song_recommendations"
+													value={field.state.value ?? ""}
+													onChange={(e) => field.handleChange(e.target.value)}
+													placeholder="ABBA, Beyoncé, that one song you're embarrassed about..."
+												/>
+											)}
+										</form.Field>
+
+										<form.Subscribe selector={(s) => s.isSubmitting}>
+											{(isSubmitting) => (
+												<div className="flex gap-4 mt-4">
+													{isEditing && (
+														<Button
+															variant="ghost"
+															size="sm"
+															className="flex-1"
+															onClick={() => setIsEditing(false)}
+														>
+															Cancel
+														</Button>
+													)}
+													<Button
+														variant="primary"
+														type="submit"
+														disabled={isSubmitting}
+														className="flex-1"
+													>
+														{isSubmitting
+															? "Saving..."
+															: isEditing
+																? "Update RSVP"
+																: "Send RSVP"}
+													</Button>
+												</div>
+											)}
+										</form.Subscribe>
 									</form>
 								</div>
 							) : null}
 						</div>
 					</div>
 				</PageSection>
+
+				{/* ── TRAVEL & VENUE ── */}
+				<PageSection id="travel" bg="s2">
+					<div className="page-wrap text-center">
+						<h2
+							className="display-title text-4xl mb-12"
+							style={{ color: "var(--heading-on-bg)" }}
+						>
+							Travel &amp; Venue
+						</h2>
+						<div className="max-w-2xl mx-auto text-center">
+							<img
+								src="/images/bridgewater.jpg"
+								alt="Bridgewater Estate Venue"
+								className="w-full h-64 object-cover rounded-xl mb-8 shadow-md"
+							/>
+							<h3
+								className="display-title text-3xl mb-4"
+								style={{ color: "var(--heading-on-bg)" }}
+							>
+								Bridgewater Estate
+							</h3>
+							<p className="text-xl font-serif mb-2 opacity-70">
+								Helensville, Auckland, New Zealand
+							</p>
+							<p
+								className="mb-8 font-serif text-xl tracking-wide"
+								style={{ color: "var(--color-plum-pink)" }}
+							>
+								561 Peak Road, Auckland 0875
+							</p>
+							<div className="flex gap-4 justify-center">
+								<Button
+									href="https://maps.apple.com/?address=561+Peak+Road,+Auckland+0875"
+									variant="wine"
+									target="_blank"
+									rel="noreferrer"
+								>
+									Get Directions
+								</Button>
+								<Button
+									href="https://www.bridgewaterestate.co.nz/more/information-for-guests"
+									variant="ghost"
+									target="_blank"
+									rel="noreferrer"
+								>
+									Guest Information
+								</Button>
+							</div>
+						</div>
+					</div>
+				</PageSection>
+
+				{/* ── ATTIRE ── */}
+				<WeddingAttire />
 			</main>
 		</>
 	);
