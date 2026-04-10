@@ -1,7 +1,11 @@
 import { useForm } from "@tanstack/react-form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useState } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+gsap.registerPlugin(useGSAP);
 import { z } from "zod";
 import { RsvpInsertInput } from "#/gql/graphql";
 import Button from "../components/ui/Button";
@@ -122,20 +126,90 @@ function EnvelopeOverlay({
 		"sealed",
 	);
 
-	const handleOpen = useCallback(() => {
+	const sceneRef = useRef<HTMLButtonElement>(null);
+	const containerRef = useRef<HTMLDivElement>(null);
+	const letterRef = useRef<HTMLDivElement>(null);
+	const flapFrontRef = useRef<HTMLDivElement>(null);
+	const sealRef = useRef<HTMLDivElement>(null);
+	const floatTweenRef = useRef<gsap.core.Tween | null>(null);
+
+	// Idle float animation on mount
+	const { contextSafe } = useGSAP(() => {
+		floatTweenRef.current = gsap.to(containerRef.current, {
+			y: -8,
+			duration: 2.5,
+			ease: "sine.inOut",
+			yoyo: true,
+			repeat: -1,
+		});
+	}, { scope: sceneRef });
+
+	const handleOpen = contextSafe(() => {
 		if (phase !== "sealed") return;
 		setPhase("opening");
-		setTimeout(() => {
-			setPhase("exiting");
-			onExiting();
-		}, 1200);
-		setTimeout(onOpened, 2000);
-	}, [phase, onOpened, onExiting]);
 
-	const isAnimating = phase !== "sealed";
+		// Kill float and snap container to rest
+		floatTweenRef.current?.kill();
+		gsap.set(containerRef.current, { y: 0 });
+
+		const tl = gsap.timeline({ onComplete: onOpened });
+
+		// Seal: gentle punch-up then drift and dissolve
+		tl.to(sealRef.current, {
+			scale: 1.07,
+			duration: 0.12,
+			ease: "power2.out",
+		}).to(sealRef.current, {
+			scale: 0.65,
+			y: -18,
+			rotation: 7,
+			autoAlpha: 0,
+			duration: 0.42,
+			ease: "power2.in",
+		});
+
+		// Flap opens — parent has CSS perspective:1000px so just rotationX here
+		tl.to(
+			flapFrontRef.current,
+			{
+				rotationX: -180,
+				duration: 0.88,
+				ease: "power3.out",
+			},
+			0.08,
+		);
+
+		// Letter rises with slight overshoot
+		tl.to(
+			letterRef.current,
+			{
+				yPercent: -95,
+				duration: 0.78,
+				ease: "back.out(1.15)",
+			},
+			0.46,
+		);
+
+		// Exit: slow fade + gentle scale recession so crossfade feels graceful
+		tl.to(
+			sceneRef.current,
+			{
+				autoAlpha: 0,
+				scale: 0.96,
+				duration: 1.5,
+				ease: "power2.inOut",
+				onStart: () => {
+					setPhase("exiting");
+					onExiting();
+				},
+			},
+			1.2,
+		);
+	});
 
 	return (
 		<button
+			ref={sceneRef}
 			className={`fullscreen-overlay envelope-scene${phase === "exiting" ? " is-exiting" : ""}`}
 			type="button"
 			tabIndex={0}
@@ -147,23 +221,32 @@ function EnvelopeOverlay({
 					: undefined
 			}
 		>
-			<p className="font-serif text-3xl" style={{
-				color: "var(--color-wine)",
-			}}>You&apos;re Invited</p>
+			<p className="font-serif text-3xl" style={{ color: "var(--color-wine)" }}>
+				You&apos;re Invited
+			</p>
 
-			{/* Container: provides positioning context for letter/flap/seal without overflow clipping */}
-			<div
-				className={`envelope-container${isAnimating ? " is-animating" : ""}`}
-			>
-				{/* Letter — sibling of envelope-outer, free to rise above it */}
-				<div className={`envelope-letter${isAnimating ? " is-rising" : ""}`}>
+			<div ref={containerRef} className="envelope-container">
+				{/* SVG clip path: curved bezier edges for natural-looking flap */}
+				<svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
+					<defs>
+						<clipPath id="envelope-flap-clip" clipPathUnits="objectBoundingBox">
+							{/* Straight sides with:
+							    - rounded top corners (Q arcs matching the 8px envelope border-radius)
+							    - rounded bottom tip where the flap meets the wax seal */}
+							<path d="M 0.02 0 Q 0 0 0 0.05 L 0.47 0.75 Q 0.5 0.88 0.53 0.75 L 1 0.05 Q 1 0 0.98 0 Z" />
+						</clipPath>
+					</defs>
+				</svg>
+
+				{/* Letter — rises above envelope on open */}
+				<div ref={letterRef} className="envelope-letter">
 					<p className="envelope-letter-title">Ben &amp; Brit</p>
 					<div className="envelope-letter-divider" />
 					<p className="envelope-letter-date">November 6th, 2026</p>
 					<p className="envelope-letter-venue">Bridgewater Estate</p>
 				</div>
 
-				{/* envelope-outer: overflow:hidden + border-radius — only contains body elements */}
+				{/* Envelope body — overflow:hidden clips fold triangles */}
 				<div className="envelope-outer">
 					<div className="envelope-body-back" />
 					<div className="envelope-fold-left" />
@@ -183,14 +266,14 @@ function EnvelopeOverlay({
 					<div className="envelope-seams" />
 				</div>
 
-				{/* Flap — sibling of envelope-outer, unaffected by its overflow */}
-				<div className={`envelope-flap${isAnimating ? " is-open" : ""}`}>
-					<div className="envelope-flap-front" />
+				{/* Flap — parent has perspective:1000px; rotationX drives the 3D open */}
+				<div className={`envelope-flap${phase !== "sealed" ? " is-open" : ""}`}>
+					<div ref={flapFrontRef} className="envelope-flap-front" />
 					<div className="envelope-flap-back" />
 				</div>
 
 				{/* Wax seal */}
-				<div className={`envelope-seal${isAnimating ? " is-broken" : ""}`}>
+				<div ref={sealRef} className="envelope-seal">
 					<svg
 						viewBox="0 0 80 80"
 						xmlns="http://www.w3.org/2000/svg"
@@ -484,7 +567,7 @@ function App() {
 			<main
 				style={{
 					opacity: mainVisible ? 1 : 0,
-					transition: "opacity 0.8s ease",
+					transition: "opacity 1.5s ease",
 				}}
 			>
 				{/* ── HERO ── */}

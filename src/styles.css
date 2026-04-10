@@ -129,14 +129,12 @@ h1, h2, h3, h4, h5, h6, .display-title {
 .envelope-scene {
   gap: 2.8rem;
   background: #ede5da;
-  transition: opacity 0.9s ease;
   cursor: default;
 }
 
+/* pointer-events off once exiting; opacity driven by GSAP */
 .envelope-scene.is-exiting {
-  opacity: 0;
   pointer-events: none;
-  transition: opacity 0.8s ease;
 }
 
 body:has(.envelope-scene:not(.is-exiting)) {
@@ -144,26 +142,16 @@ body:has(.envelope-scene:not(.is-exiting)) {
 }
 
 
-@keyframes envelope-float {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-8px); }
-}
-
-/* Container: sizing, shadow, float animation — no overflow clipping */
+/* Container: sizing, shadow — float driven by GSAP */
 .envelope-container {
   position: relative;
   width: min(420px, 90vw);
   aspect-ratio: 1.6;
-  animation: envelope-float 5s ease-in-out infinite;
   box-shadow:
     0 32px 56px rgba(80, 40, 20, 0.16),
     0 8px 20px rgba(80, 40, 20, 0.10),
     0 2px 4px rgba(80, 40, 20, 0.07);
   border-radius: 8px;
-}
-
-.envelope-container.is-animating {
-  animation: none;
 }
 
 /* Outer: clips the fold triangles with rounded corners — no stacking context issues
@@ -253,15 +241,10 @@ body:has(.envelope-scene:not(.is-exiting)) {
   padding: 0.85rem 1rem;
   text-align: center;
   box-shadow: 0 4px 16px rgba(80, 40, 20, 0.12);
-  transform: translateY(0);
-  transition: transform 1.0s cubic-bezier(0.25, 0.1, 0.25, 1) 0.25s;
   z-index: 2;
   height: 80%;
 }
 
-.envelope-letter.is-rising {
-  transform: translateY(-88%);
-}
 
 .envelope-letter-title {
   font-family: var(--font-serif);
@@ -310,27 +293,17 @@ body:has(.envelope-scene:not(.is-exiting)) {
   height: 62%;
   perspective: 1000px;
   z-index: 5;
-  filter: drop-shadow(0 6px 10px rgba(80, 40, 20, 0.18));
-  transition: filter 1.4s ease;
+  /* drop-shadow removed — CSS filters apply in 2D screen space and look wrong
+     during 3D rotation; depth is handled by the container box-shadow instead */
 }
 
-.envelope-flap.is-open {
-  filter: drop-shadow(0 14px 20px rgba(80, 40, 20, 0.22));
-}
-
-/* Top flap — very slightly warmer than the body so it reads as a separate layer */
+/* Top flap — clip-path uses SVG #envelope-flap-clip for curved, natural edges */
 .envelope-flap-front {
   position: absolute;
   inset: 0;
-  clip-path: polygon(0 0, 100% 0, 50% 80%);
+  clip-path: url(#envelope-flap-clip);
   background: #f3ede6;
   transform-origin: top center;
-  transform: perspective(1000px) rotateX(0deg);
-  transition: transform 1.4s cubic-bezier(0.25, 0.1, 0.25, 1);
-}
-
-.envelope-flap.is-open .envelope-flap-front {
-  transform: perspective(1000px) rotateX(-180deg);
 }
 
 .envelope-flap-back { display: none; }
@@ -343,11 +316,5 @@ body:has(.envelope-scene:not(.is-exiting)) {
   transform: translateX(-50%);
   z-index: 6;
   filter: drop-shadow(0 3px 8px rgba(60, 5, 20, 0.4)) drop-shadow(0 1px 2px rgba(60, 5, 20, 0.25));
-  transition: transform 0.4s ease, opacity 0.4s ease;
   cursor: pointer;
-}
-
-.envelope-seal.is-broken {
-  transform: translateX(-50%) scale(0.4) rotate(15deg);
-  opacity: 0;
 }
