@@ -172,7 +172,7 @@ function AdminDashboard() {
 					</h2>
 					<form onSubmit={handleCreate} className="flex flex-col gap-4">
 						<div className="flex gap-4">
-							<label className="flex-1 flex flex-col gap-2">
+							<label className="flex flex-col gap-2">
 								<span className="text-xs uppercase font-bold text-gray-500 tracking-wider">
 									Guest Name
 								</span>
@@ -184,12 +184,11 @@ function AdminDashboard() {
 									className="p-3 border rounded-lg focus:ring-[color:var(--color-burnt-orange)] outline-none bg-[color:var(--color-eggshell)]"
 								/>
 							</label>
-							<label className="flex flex-col gap-2">
+							<label className="flex-1 flex flex-col gap-2">
 								<span className="text-xs uppercase font-bold text-gray-500 tracking-wider">
 									Message
 								</span>
-								<input
-									type="text"
+								<textarea
 									value={message}
 									onChange={(e) => setMessage(e.target.value)}
 									className="p-3 border rounded-lg focus:ring-[color:var(--color-burnt-orange)] outline-none bg-[color:var(--color-eggshell)]"
@@ -256,7 +255,7 @@ function AdminDashboard() {
 											</td>
 											<td className="py-4 font-mono text-xs text-blue-500 pr-4">
 												<a
-													href={`/?id=${invite.id}#welcome`}
+													href={`/?id=${invite.id}#home`}
 													target="_blank"
 													rel="noreferrer"
 													className="hover:underline"
