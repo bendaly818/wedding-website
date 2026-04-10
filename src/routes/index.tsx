@@ -5,7 +5,9 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-gsap.registerPlugin(useGSAP);
+if (typeof window !== "undefined") {
+	gsap.registerPlugin(useGSAP);
+}
 import { z } from "zod";
 import { RsvpInsertInput } from "#/gql/graphql";
 import Button from "../components/ui/Button";
