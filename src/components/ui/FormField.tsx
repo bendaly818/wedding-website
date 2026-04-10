@@ -13,10 +13,10 @@ interface FormFieldProps {
 export default function FormField({ label, hint, name, value, onChange, placeholder, rows = 3 }: FormFieldProps) {
 	return (
 		<div>
-			<label className="block text-sm font-bold uppercase tracking-wider mb-2">
+			<label className="block text-base font-bold uppercase tracking-wider mb-2">
 				{label}
 			</label>
-			{hint && <p className="text-sm opacity-60 mb-3">{hint}</p>}
+			{hint && <p className="text-base opacity-60 mb-3">{hint}</p>}
 			<textarea
 				rows={rows}
 				name={name}

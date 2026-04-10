@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A personalized wedding invitation/RSVP website for a November 6th 2026 wedding at Bridgewater Estate, Helensville, Auckland, NZ. Built as a single-page scrollable site with sections: Home, RSVP, Schedule, Travel, Contact.
+A personalized wedding invitation/RSVP website for a November 6th 2026 wedding at Bridgewater Estate, Helensville, Auckland, NZ. Built as a single-page scrollable site with sections: Home, RSVP, Travel, Attire
 
 ## Commands
 

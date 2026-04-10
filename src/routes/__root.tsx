@@ -21,6 +21,16 @@ export const Route = createRootRoute({
       },
     ],
     links: [
+      { rel: 'icon', href: '/favicon.ico', sizes: '64x64 32x32 24x24 16x16', type: 'image/x-icon' },
+      { rel: 'icon', href: '/logo192.png', sizes: '192x192', type: 'image/png' },
+      { rel: 'apple-touch-icon', href: '/logo192.png' },
+      { rel: 'manifest', href: '/manifest.json' },
+      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+      { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
+      {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=Faculty+Glyphic&family=Jost:ital,wght@0,100..900;1,100..900&display=swap',
+      },
       {
         rel: 'stylesheet',
         href: appCss,

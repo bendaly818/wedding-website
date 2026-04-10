@@ -21,7 +21,7 @@ export default function Header() {
 				</h2>
 
 				{/* Desktop nav */}
-				<div className="hidden sm:flex items-center gap-x-6 text-sm uppercase tracking-widest">
+				<div className="hidden sm:flex items-center gap-x-6 text-base uppercase tracking-widest">
 					{NAV_LINKS.map(({ href, label }) => (
 						<a key={href} href={href} className="nav-link">
 							{label}
@@ -51,7 +51,7 @@ export default function Header() {
 
 			{/* Mobile dropdown */}
 			{open && (
-				<div className="sm:hidden flex flex-col items-center gap-4 py-4 text-sm uppercase tracking-widest border-t border-black/5">
+				<div className="sm:hidden flex flex-col items-center gap-4 py-4 text-base uppercase tracking-widest border-t border-black/5">
 					{NAV_LINKS.map(({ href, label }) => (
 						<a
 							key={href}

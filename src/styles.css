@@ -143,15 +143,6 @@ body:has(.envelope-scene:not(.is-exiting)) {
   overflow: hidden;
 }
 
-/* "You're Invited" tagline */
-.envelope-tagline {
-  font-family: var(--font-serif);
-  font-size: 1.1rem;
-  font-weight: 400;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: rgba(107, 21, 53, 0.45);
-}
 
 @keyframes envelope-float {
   0%, 100% { transform: translateY(0px); }
@@ -265,6 +256,7 @@ body:has(.envelope-scene:not(.is-exiting)) {
   transform: translateY(0);
   transition: transform 1.0s cubic-bezier(0.25, 0.1, 0.25, 1) 0.25s;
   z-index: 2;
+  height: 80%;
 }
 
 .envelope-letter.is-rising {

@@ -8,6 +8,7 @@ import Button from "../components/ui/Button";
 import FormField from "../components/ui/FormField";
 import PageSection from "../components/ui/PageSection";
 import RadioCard from "../components/ui/RadioCard";
+import SongPicker from "../components/ui/SongPicker";
 import { getInvite } from "./api/-invite";
 import { getRsvp, submitRsvp, updateRsvp } from "./api/-rsvp";
 
@@ -17,6 +18,11 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/")({
 	validateSearch: searchSchema,
+	loaderDeps: ({ search }) => ({ id: search.id }),
+	loader: async ({ deps: { id } }) => {
+		if (!id) return null;
+		return await getInvite({ data: id });
+	},
 	component: App,
 });
 
@@ -85,14 +91,14 @@ function ComingSoon() {
 					))}
 				</div>
 				<p
-					className="text-base leading-relaxed mb-6"
+					className="text-lg leading-relaxed mb-6"
 					style={{ color: "var(--heading-on-bg)", opacity: 0.6 }}
 				>
 					Something wonderful is on its way. Check back once you have your
 					invitation in hand.
 				</p>
 				<p
-					className="text-sm font-semibold tracking-widest uppercase"
+					className="text-base font-semibold tracking-widest uppercase"
 					style={{ color: "var(--color-plum-pink)", opacity: 0.7 }}
 				>
 					November 6th, 2026
@@ -141,7 +147,9 @@ function EnvelopeOverlay({
 					: undefined
 			}
 		>
-			<p className="envelope-tagline">You&apos;re Invited</p>
+			<p className="font-serif text-3xl" style={{
+				color: "var(--color-wine)",
+			}}>You&apos;re Invited</p>
 
 			{/* Container: provides positioning context for letter/flap/seal without overflow clipping */}
 			<div
@@ -265,12 +273,12 @@ function WeddingAttire() {
 					{/* ── Women ── */}
 					<div className="flex-1 text-center">
 						<h4
-							className="font-serif text-xl font-semibold mb-3"
+							className="text-xl font-semibold mb-3"
 							style={{ color: "var(--heading-on-bg)" }}
 						>
 							For Women
 						</h4>
-						<p className="text-sm leading-relaxed opacity-70 max-w-[400px] mx-auto">
+						<p className="text-base leading-relaxed opacity-70 max-w-[400px] mx-auto">
 							Cocktail, midi, or maxi dresses are perfect. As some areas of the
 							venue have uneven ground, we recommend wearing block heels,
 							wedges, or flats instead of stilettos.
@@ -280,12 +288,12 @@ function WeddingAttire() {
 					{/* ── Men ── */}
 					<div className="flex-1 text-center">
 						<h4
-							className="font-serif text-xl font-semibold mb-3"
+							className="text-xl font-semibold mb-3"
 							style={{ color: "var(--heading-on-bg)" }}
 						>
 							For Men
 						</h4>
-						<p className="text-sm leading-relaxed opacity-70 max-w-[400px] mx-auto">
+						<p className="text-base leading-relaxed opacity-70 max-w-[400px] mx-auto">
 							A tailored blazer with trousers or a full suit is ideal. Dress
 							shirts or button-downs are encouraged, and ties are completely
 							optional — feel free to keep things polished yet relaxed.
@@ -305,34 +313,52 @@ function App() {
 	const { id: urlId } = Route.useSearch();
 	const queryClient = useQueryClient();
 
+	// SSR-fetched invite (populated when ?id= is in the URL)
+	const loaderResult = Route.useLoaderData();
+
 	// Resolve invite ID from URL param or localStorage (localStorage is client-only)
 	const [inviteId, setInviteId] = useState<string | null>(urlId ?? null);
 	const [idResolved, setIdResolved] = useState(!!urlId);
 	const [envelopeOpened, setEnvelopeOpened] = useState(false);
+	// False until the useEffect has read localStorage — prevents the envelope
+	// flashing on return visits before we know it's already been opened.
+	const [envelopeStateKnown, setEnvelopeStateKnown] = useState(false);
 	// mainVisible drives the site fade-in; true immediately for return visitors
 	const [mainVisible, setMainVisible] = useState(false);
 
 	useEffect(() => {
-		const id = urlId ?? readStoredId();
-		if (id) persistId(id);
-		setInviteId(id ?? null);
-		setIdResolved(true);
-		const alreadyOpened = id ? hasOpenedEnvelope(id) : false;
-		if (alreadyOpened) {
-			setEnvelopeOpened(true);
-			setMainVisible(true); // skip fade-in for return visitors
+		// localStorage is client-only — this effect is unavoidable.
+		let id: string | null = urlId ?? null;
+		if (urlId) {
+			// URL param case: ID already in state; just persist it.
+			persistId(urlId);
+		} else {
+			// localStorage-only case: resolve ID from storage.
+			id = readStoredId();
+			setInviteId(id);
+			setIdResolved(true);
+			if (id) persistId(id);
 		}
+		if (id && hasOpenedEnvelope(id)) {
+			setEnvelopeOpened(true);
+			setMainVisible(true);
+		}
+		setEnvelopeStateKnown(true);
 	}, [urlId]);
 
 	// Fetch invite
 	const inviteQuery = useQuery({
 		queryKey: ["invite", inviteId],
 		queryFn: async () => {
-			const res = await getInvite(inviteId!);
+			const res = await getInvite({ data: inviteId! });
 			if (!res.success) clearStoredId();
 			return res;
 		},
 		enabled: idResolved && !!inviteId,
+		// Seed from SSR loader data so the first render has content immediately
+		initialData: loaderResult ?? undefined,
+		// Invites don't change mid-session; avoid redundant background refetch
+		staleTime: Number.POSITIVE_INFINITY,
 	});
 
 	const invite = inviteQuery.data?.success ? inviteQuery.data.invite : null;
@@ -341,7 +367,7 @@ function App() {
 	// Fetch RSVP (only once invite is confirmed)
 	const rsvpQuery = useQuery({
 		queryKey: ["rsvp", inviteId],
-		queryFn: () => getRsvp(inviteId!),
+		queryFn: () => getRsvp({ data: inviteId! }),
 		enabled: !!invite,
 	});
 
@@ -349,7 +375,7 @@ function App() {
 
 	// Derive stage from query states
 	const stage: Stage = (() => {
-		if (!idResolved) return "initializing";
+		if (!idResolved || !envelopeStateKnown) return "initializing";
 		if (!inviteId) return "no-invite";
 		if (inviteQuery.isPending) return "initializing";
 		if (!inviteQuery.data?.success) return "no-invite";
@@ -373,12 +399,14 @@ function App() {
 			if (!inviteId) return;
 			try {
 				const result = await (existingRsvp ? updateRsvp : submitRsvp)({
-					invite_id: inviteId,
-					attending: value.attending,
-					dietary: value.dietary,
-					transit: value.transit,
-					physical_invite: value.physical_invite,
-					song_recommendations: value.song_recommendations,
+					data: {
+						invite_id: inviteId,
+						attending: value.attending,
+						dietary: value.dietary,
+						transit: value.transit,
+						physical_invite: value.physical_invite,
+						song_recommendations: value.song_recommendations,
+					},
 				});
 				if (!result.success) {
 					alert("Something went wrong saving your RSVP. Please try again.");
@@ -527,7 +555,7 @@ function App() {
 							We're getting married!
 						</p>
 						<div
-							className="text-lg md:text-xl mb-10"
+							className="text-xl md:text-3xl mb-10  font-serif font-light"
 							style={{ color: "var(--color-blush-light)" }}
 						>
 							on November 6th, 2026
@@ -544,7 +572,7 @@ function App() {
 											Thanks for RSVPing, {guestName}!
 										</p>
 										<p
-											className="mt-2 mb-4 text-lg md:text-xl"
+											className="mt-2 mb-4 text-xl md:text-3xl font-serif font-light"
 											style={{
 												color: "var(--color-blush-light)",
 											}}
@@ -564,23 +592,23 @@ function App() {
 										>
 											{guestName}
 										</h3>
-										<p
-									className="mt-2 mb-4 text-lg md:text-xl"
-											style={{
-												color: "var(--color-blush-light)",
-											}}
-										>
-											We are so excited to have you join us for our special day!
-										</p>
-										{invite?.message && (
+										
+										{invite?.message ? (
 											<p 
-											className="mt-2 mb-4 text-lg md:text-xl"
+											className="mt-2 mb-4 text-xl md:text-3xl font-serif font-light"
 											style={{
 												color: "var(--color-blush-light)",
 											}}>
 												{invite.message}
 											</p>
-										)}
+										) :<p
+									className="mt-2 mb-4 text-xl md:text-3xl font-serif font-light"
+											style={{
+												color: "var(--color-blush-light)",
+											}}
+										>
+											We are so excited to have you join us for our special day!
+										</p>}
 									</>
 								)}
 							</div>
@@ -611,17 +639,17 @@ function App() {
 							RSVP
 						</h2>
 
-						<div className="max-w-2xl mx-auto p-8 min-h-[400px] flex flex-col justify-center">
+						<div className="max-w-2xl mx-auto min-h-[400px] flex flex-col justify-center">
 							{existingRsvp && !isEditing ? (
 								<div className="py-12">
 									<div className="text-6xl mb-6">💌</div>
 									<h3
-										className="text-3xl font-serif mb-4"
+										className="text-4xl mb-4"
 										style={{ color: "var(--heading-on-bg)" }}
 									>
 										Thank You!
 									</h3>
-									<p className="text-lg opacity-70 mb-8">
+									<p className="text-xl opacity-70 mb-8">
 										Your RSVP has been sent. We can't wait to celebrate with
 										you!
 									</p>
@@ -632,12 +660,15 @@ function App() {
 							) : guestName ? (
 								<div>
 									<h3
-										className="text-2xl font-serif mb-4"
+										className="text-3xl mb-4"
 										style={{ color: "var(--heading-on-bg)" }}
 									>
 										Hi {guestName}!
 									</h3>
-									<p className="mb-8 opacity-70 text-lg">
+									<p className="mb-8 font-serif text-lg"
+									
+										style={{ color: "var(--color-wine)" }}
+									>
 										{isEditing
 											? "Update your response below."
 											: "We would love to know if you can make it to our special day."}
@@ -655,7 +686,7 @@ function App() {
 												<div>
 													<label
 														htmlFor={field.name}
-														className="block text-sm font-bold uppercase tracking-wider mb-2"
+														className="block text-base font-bold uppercase tracking-wider mb-2"
 													>
 														Will you be attending?
 													</label>
@@ -698,11 +729,11 @@ function App() {
 												<div>
 													<label
 														htmlFor={field.name}
-														className="block text-sm font-bold uppercase tracking-wider mb-2"
+														className="block text-base font-bold uppercase tracking-wider mb-2"
 													>
 														Would you like transit to &amp; from the venue?
 													</label>
-													<p className="text-sm opacity-60 mb-3">
+													<p className="text-base opacity-60 mb-3">
 														We're arranging transport from a central Auckland
 														location.
 													</p>
@@ -713,6 +744,7 @@ function App() {
 															label="Yes please!"
 															checked={field.state.value === true}
 															onChange={() => field.handleChange(true)}
+														required
 														/>
 														<RadioCard
 															name="transit"
@@ -720,6 +752,7 @@ function App() {
 															label="No thanks"
 															checked={field.state.value === false}
 															onChange={() => field.handleChange(false)}
+															required
 														/>
 													</div>
 												</div>
@@ -731,11 +764,11 @@ function App() {
 												<div>
 													<label
 														htmlFor={field.name}
-														className="block text-sm font-bold uppercase tracking-wider mb-2"
+														className="block text-base font-bold uppercase tracking-wider mb-2"
 													>
 														Would you like a physical invite?
 													</label>
-													<p className="text-sm opacity-60 mb-3">
+													<p className="text-base opacity-60 mb-3">
 														Something to put on the fridge and remember the day.
 													</p>
 													<div className="flex gap-4">
@@ -745,6 +778,7 @@ function App() {
 															label="Yes please!"
 															checked={field.state.value === true}
 															onChange={() => field.handleChange(true)}
+														required
 														/>
 														<RadioCard
 															name="physical_invite"
@@ -752,6 +786,7 @@ function App() {
 															label="No thanks"
 															checked={field.state.value === false}
 															onChange={() => field.handleChange(false)}
+															required
 														/>
 													</div>
 												</div>
@@ -760,13 +795,10 @@ function App() {
 
 										<form.Field name="song_recommendations">
 											{(field) => (
-												<FormField
-													label="What songs will get you on the dance floor?"
-													hint="Bribe the DJ with your best tunes. No judgement (okay, maybe a little)."
-													name="song_recommendations"
+												<SongPicker
 													value={field.state.value ?? ""}
-													onChange={(e) => field.handleChange(e.target.value)}
-													placeholder="ABBA, Beyoncé, that one song you're embarrassed about..."
+													onChange={(v) => field.handleChange(v)}
+													required
 												/>
 											)}
 										</form.Field>
@@ -857,21 +889,21 @@ function App() {
 
 							<div className="mt-10 text-left rounded-xl p-6">
 								<h4
-									className="display-title text-xl mb-1"
+									className="display-title text-2xl mb-2"
 									style={{ color: "var(--heading-on-bg)" }}
 								>
 									Getting There
 								</h4>
-								<p className="font-serif opacity-70 mb-4">
-									If you're not using the shuttle service that we will provide and you're not driving yourself - a quick note that Uber does not operate in the area of the wedding and you need to pre-book a taxi or shuttle.
+								<p className="opacity-70 mb-4 leading-relaxed text-base">
+									If you're not using the shuttle service that we will provide and you're not driving yourself — a quick note that Uber does not operate in the area of the wedding, so you'll need to pre-book a taxi or shuttle.
 								</p>
-								<ul className="font-serif space-y-1 opacity-80 text-sm">
-									<li><span className="font-semibold">Liberty Shuttles</span> — <a href="tel:0800995511" className="underline">0800 99 55 11</a></li>
-									<li><span className="font-semibold">Huapai Transfers</span> — <a href="tel:02049527222" className="underline">0204 952 722</a></li>
-									<li><span className="font-semibold">Nor West Taxis</span> — <a href="tel:094129335" className="underline">09 412 9335</a></li>
-									<li><span className="font-semibold">Budget Taxi</span> — <a href="tel:098494000" className="underline">09 849 4000</a></li>
-									<li><span className="font-semibold">Corporate Cabs</span> — <a href="tel:0800789789" className="underline">0800 789 789</a></li>
-									<li><span className="font-semibold">Quick Shuttle</span> — <a href="mailto:info@quickshuttle.co.nz" className="underline">info@quickshuttle.co.nz</a></li>
+								<ul className="space-y-2 text-base">
+									<li><span className="font-semibold opacity-80">Liberty Shuttles</span> <span className="opacity-50">—</span> <a href="tel:0800995511" className="text-[var(--color-wine)] hover:underline">0800 99 55 11</a></li>
+									<li><span className="font-semibold opacity-80">Huapai Transfers</span> <span className="opacity-50">—</span> <a href="tel:02049527222" className="text-[var(--color-wine)] hover:underline">0204 952 722</a></li>
+									<li><span className="font-semibold opacity-80">Nor West Taxis</span> <span className="opacity-50">—</span> <a href="tel:094129335" className="text-[var(--color-wine)] hover:underline">09 412 9335</a></li>
+									<li><span className="font-semibold opacity-80">Budget Taxi</span> <span className="opacity-50">—</span> <a href="tel:098494000" className="text-[var(--color-wine)] hover:underline">09 849 4000</a></li>
+									<li><span className="font-semibold opacity-80">Corporate Cabs</span> <span className="opacity-50">—</span> <a href="tel:0800789789" className="text-[var(--color-wine)] hover:underline">0800 789 789</a></li>
+									<li><span className="font-semibold opacity-80">Quick Shuttle</span> <span className="opacity-50">—</span> <a href="mailto:info@quickshuttle.co.nz" className="text-[var(--color-wine)] hover:underline">info@quickshuttle.co.nz</a></li>
 								</ul>
 							</div>
 						</div>
