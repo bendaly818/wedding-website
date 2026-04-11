@@ -7,7 +7,8 @@
   "vars": {
     "SUPABASE_URL": "https://jhomnlzkpbnwhksgpvga.supabase.co",
     "VITE_SUPABASE_URL": "https://jhomnlzkpbnwhksgpvga.supabase.co",
-    "VITE_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_5ZfTz8rvrT7-cibq7VJC0g_vo202Kl1"
+    "VITE_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_5ZfTz8rvrT7-cibq7VJC0g_vo202Kl1",
+    "SPOTIFY_REDIRECT_URI": "https://wedding-website.bendaly0403.workers.dev/admin/spotify-callback"
   },
    "observability": {
     "logs": {

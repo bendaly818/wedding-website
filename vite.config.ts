@@ -7,16 +7,21 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
+import mkcert from "vite-plugin-mkcert";
 
 const config = defineConfig({
+	server: {
+		host: "0.0.0.0",
+	},
 	plugins: [
+		mkcert(),
 		devtools(),
 		cloudflare({ viteEnvironment: { name: "ssr" } }),
 		tsconfigPaths({ projects: ["./tsconfig.json"] }),
 		tailwindcss(),
 		tanstackStart(),
 		viteReact(),
-	],
+	]
 });
 
 export default config;

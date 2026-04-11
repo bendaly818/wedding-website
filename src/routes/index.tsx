@@ -9,7 +9,7 @@ if (typeof window !== "undefined") {
 	gsap.registerPlugin(useGSAP);
 }
 import { z } from "zod";
-import { RsvpInsertInput } from "#/gql/graphql";
+import type { RsvpInsertInput } from "#/gql/graphql";
 import Button from "../components/ui/Button";
 import FormField from "../components/ui/FormField";
 import PageSection from "../components/ui/PageSection";

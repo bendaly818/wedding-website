@@ -206,6 +206,15 @@ scalar JSON
 
 """The root type for creating and mutating data"""
 type Mutation {
+  """Deletes zero or more records from the `app_settings` collection"""
+  deleteFromapp_settingsCollection(
+    """
+    The maximum number of records in the collection permitted to be affected
+    """
+    atMost: Int! = 1
+    """Restricts the mutation's impact to records matching the criteria"""
+    filter: app_settingsFilter
+  ): app_settingsDeleteResponse!
   """Deletes zero or more records from the `invite` collection"""
   deleteFrominviteCollection(
     """
@@ -224,10 +233,25 @@ type Mutation {
     """Restricts the mutation's impact to records matching the criteria"""
     filter: rsvpFilter
   ): rsvpDeleteResponse!
+  """Adds one or more `app_settings` records to the collection"""
+  insertIntoapp_settingsCollection(objects: [app_settingsInsertInput!]!): app_settingsInsertResponse
   """Adds one or more `invite` records to the collection"""
   insertIntoinviteCollection(objects: [inviteInsertInput!]!): inviteInsertResponse
   """Adds one or more `rsvp` records to the collection"""
   insertIntorsvpCollection(objects: [rsvpInsertInput!]!): rsvpInsertResponse
+  """Updates zero or more records in the `app_settings` collection"""
+  updateapp_settingsCollection(
+    """
+    The maximum number of records in the collection permitted to be affected
+    """
+    atMost: Int! = 1
+    """Restricts the mutation's impact to records matching the criteria"""
+    filter: app_settingsFilter
+    """
+    Fields that are set will be updated for all records matching the `filter`
+    """
+    set: app_settingsUpdateInput!
+  ): app_settingsUpdateResponse!
   """Updates zero or more records in the `invite` collection"""
   updateinviteCollection(
     """
@@ -293,6 +317,25 @@ type PageInfo {
 
 """The root type for querying data"""
 type Query {
+  """A pagable collection of type `app_settings`"""
+  app_settingsCollection(
+    """Query values in the collection after the provided cursor"""
+    after: Cursor
+    """Query values in the collection before the provided cursor"""
+    before: Cursor
+    """Filters to apply to the results set when querying from the collection"""
+    filter: app_settingsFilter
+    """Query the first `n` records in the collection"""
+    first: Int
+    """Query the last `n` records in the collection"""
+    last: Int
+    """
+    Skip n values from the after cursor. Alternative to cursor pagination. Backward pagination not supported.
+    """
+    offset: Int
+    """Sort order to apply to the collection"""
+    orderBy: [app_settingsOrderBy!]
+  ): app_settingsConnection
   """A pagable collection of type `invite`"""
   inviteCollection(
     """Query values in the collection after the provided cursor"""
@@ -418,6 +461,80 @@ input UUIDListFilter {
   eq: [UUID!]
   is: FilterIs
   overlaps: [UUID!]
+}
+
+type app_settings implements Node {
+  key: String!
+  """Globally Unique Record Identifier"""
+  nodeId: ID!
+  updated_at: Datetime!
+  value: String!
+}
+
+type app_settingsConnection {
+  edges: [app_settingsEdge!]!
+  pageInfo: PageInfo!
+}
+
+type app_settingsDeleteResponse {
+  """Count of the records impacted by the mutation"""
+  affectedCount: Int!
+  """Array of records impacted by the mutation"""
+  records: [app_settings!]!
+}
+
+type app_settingsEdge {
+  cursor: String!
+  node: app_settings!
+}
+
+input app_settingsFilter {
+  """
+  Returns true only if all its inner filters are true, otherwise returns false
+  """
+  and: [app_settingsFilter!]
+  key: StringFilter
+  nodeId: IDFilter
+  """Negates a filter"""
+  not: app_settingsFilter
+  """
+  Returns true if at least one of its inner filters is true, otherwise returns false
+  """
+  or: [app_settingsFilter!]
+  updated_at: DatetimeFilter
+  value: StringFilter
+}
+
+input app_settingsInsertInput {
+  key: String
+  updated_at: Datetime
+  value: String
+}
+
+type app_settingsInsertResponse {
+  """Count of the records impacted by the mutation"""
+  affectedCount: Int!
+  """Array of records impacted by the mutation"""
+  records: [app_settings!]!
+}
+
+input app_settingsOrderBy {
+  key: OrderByDirection
+  updated_at: OrderByDirection
+  value: OrderByDirection
+}
+
+input app_settingsUpdateInput {
+  key: String
+  updated_at: Datetime
+  value: String
+}
+
+type app_settingsUpdateResponse {
+  """Count of the records impacted by the mutation"""
+  affectedCount: Int!
+  """Array of records impacted by the mutation"""
+  records: [app_settings!]!
 }
 
 type invite implements Node {
