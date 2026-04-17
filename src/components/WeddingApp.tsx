@@ -638,7 +638,7 @@ export function WeddingApp({ inviteId: urlId, initialData: loaderResult }: Weddi
 							className="text-xl md:text-2xl mb-4  font-serif font-light"
 							style={{ color: "var(--color-blush-light)" }}
 						>
-							At Bridgewater Estate on November 6th, 2026
+							Friday, November 6th, 2026
 						</div>
 							<div
 							className="text-xl md:text-2xl mb-10  font-serif font-light"
@@ -751,14 +751,18 @@ export function WeddingApp({ inviteId: urlId, initialData: loaderResult }: Weddi
 									>
 										Hi {guestName}!
 									</h3>
-									<p className="mb-8 font-serif text-lg"
-
+									<p className="mb-3 font-serif text-lg"
 										style={{ color: "var(--color-wine)" }}
 									>
 										{isEditing
 											? "Update your response below."
 											: "We would love to know if you can make it to our special day."}
 									</p>
+									{!isEditing && (
+										<p className="mb-8 text-base opacity-60">
+											We've kept our guest list intimate and are hosting an adults-only celebration, so we're only able to welcome the people named on each invitation — we hope you understand!
+										</p>
+									)}
 									<form
 										className="flex flex-col gap-6 text-left"
 										onSubmit={(e) => {

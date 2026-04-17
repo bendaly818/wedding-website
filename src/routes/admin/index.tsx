@@ -40,6 +40,8 @@ const GET_ALL_INVITES = graphql(`
           name
           message
           sent
+          first_opened_at
+          open_count
 		  rsvpCollection {
 			edges {
 				node {
@@ -76,6 +78,41 @@ export const getAllInvites = createServerFn({ method: "GET" }).handler(
 		}
 	},
 );
+
+const UPDATE_INVITE_SENT_MUTATION = graphql(`
+  mutation UpdateInviteSent($id: UUID!, $sent: Boolean!) {
+    updateinviteCollection(
+      filter: { id: { eq: $id } }
+      set: { sent: $sent }
+    ) {
+      records {
+        id
+        sent
+      }
+    }
+  }
+`);
+
+export const updateInviteSent = createServerFn({ method: "POST" })
+	.inputValidator(
+		(data: unknown) => data as { id: string; sent: boolean },
+	)
+	.handler(async ({ data }) => {
+		const { user, accessToken } = await getAuthContext();
+		if (!user) throw new Error("Unauthorized");
+
+		try {
+			await supabaseGraphqlClient.request(
+				UPDATE_INVITE_SENT_MUTATION,
+				{ id: data.id, sent: data.sent },
+				{ Authorization: `Bearer ${accessToken}` },
+			);
+			return { success: true };
+		} catch (e) {
+			console.error(e);
+			return { success: false, error: "Failed to update invite" };
+		}
+	});
 
 const ADD_INVITE_MUTATION = graphql(`
   mutation AddInvite($name: String!, $message: String, $sent: Boolean) {
@@ -133,6 +170,8 @@ type Invite = {
 	name?: string | null;
 	message?: string | null;
 	sent?: boolean | null;
+	first_opened_at?: string | null;
+	open_count?: number | null;
 	rsvpCollection?: {
 		edges: Array<{
 			node: {
@@ -501,6 +540,14 @@ function AdminDashboard() {
 		},
 	});
 
+	const toggleSent = useMutation({
+		mutationFn: (data: { id: string; sent: boolean }) =>
+			updateInviteSent({ data }),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["invites"] });
+		},
+	});
+
 	const handleCreate = (e: React.FormEvent) => {
 		e.preventDefault();
 		createInvite.mutate({ name, message, sent });
@@ -690,6 +737,7 @@ function AdminDashboard() {
 										<th className="px-6 py-4">Invite</th>
 										<th className="px-6 py-4">Dietary</th>
 										<th className="px-6 py-4">Sent</th>
+										<th className="px-6 py-4">Opened</th>
 										<th className="px-6 py-4">Actions</th>
 									</tr>
 								</thead>
@@ -697,7 +745,7 @@ function AdminDashboard() {
 									{isLoading ? (
 										<tr>
 											<td
-												colSpan={7}
+												colSpan={8}
 												className="px-6 py-12 text-center text-gray-300 text-sm"
 											>
 												Loading…
@@ -706,7 +754,7 @@ function AdminDashboard() {
 									) : invites.length === 0 ? (
 										<tr>
 											<td
-												colSpan={7}
+												colSpan={8}
 												className="px-6 py-12 text-center text-gray-300 text-sm"
 											>
 												No invites yet. Create one above.
@@ -749,10 +797,34 @@ function AdminDashboard() {
 														)}
 													</td>
 													<td className="px-6 py-4 text-center">
-														{invite.sent ? (
-															<span className="text-emerald-500 text-lg">✓</span>
+														<button
+															type="button"
+															title={invite.sent ? "Mark as not sent" : "Mark as sent"}
+															disabled={toggleSent.isPending}
+															onClick={() => toggleSent.mutate({ id: invite.id, sent: !invite.sent })}
+															className="text-lg transition-opacity hover:opacity-70 disabled:opacity-40"
+														>
+															{invite.sent ? (
+																<span className="text-emerald-500">✓</span>
+															) : (
+																<span className="text-gray-300">✗</span>
+															)}
+														</button>
+													</td>
+													<td className="px-6 py-4">
+														{invite.first_opened_at ? (
+															<div className="flex flex-col">
+																<span className="text-xs font-medium text-gray-600">
+																	{new Date(invite.first_opened_at).toLocaleDateString("en-NZ", { day: "numeric", month: "short" })}
+																</span>
+																{(invite.open_count ?? 0) > 1 && (
+																	<span className="text-xs text-gray-400">
+																		{invite.open_count}×
+																	</span>
+																)}
+															</div>
 														) : (
-															<span className="text-gray-200 text-lg">✗</span>
+															<span className="text-gray-300">—</span>
 														)}
 													</td>
 													<td className="px-6 py-4">

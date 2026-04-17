@@ -239,6 +239,7 @@ type Mutation {
   insertIntoinviteCollection(objects: [inviteInsertInput!]!): inviteInsertResponse
   """Adds one or more `rsvp` records to the collection"""
   insertIntorsvpCollection(objects: [rsvpInsertInput!]!): rsvpInsertResponse
+  track_invite_open(p_invite_id: UUID!): Opaque
   """Updates zero or more records in the `app_settings` collection"""
   updateapp_settingsCollection(
     """
@@ -539,11 +540,13 @@ type app_settingsUpdateResponse {
 
 type invite implements Node {
   created_at: Datetime!
+  first_opened_at: Datetime
   id: UUID!
   message: String
   name: String
   """Globally Unique Record Identifier"""
   nodeId: ID!
+  open_count: Int!
   rsvpCollection(
     """Query values in the collection after the provided cursor"""
     after: Cursor
@@ -588,12 +591,14 @@ input inviteFilter {
   """
   and: [inviteFilter!]
   created_at: DatetimeFilter
+  first_opened_at: DatetimeFilter
   id: UUIDFilter
   message: StringFilter
   name: StringFilter
   nodeId: IDFilter
   """Negates a filter"""
   not: inviteFilter
+  open_count: IntFilter
   """
   Returns true if at least one of its inner filters is true, otherwise returns false
   """
@@ -603,9 +608,11 @@ input inviteFilter {
 
 input inviteInsertInput {
   created_at: Datetime
+  first_opened_at: Datetime
   id: UUID
   message: String
   name: String
+  open_count: Int
   sent: Boolean
 }
 
@@ -618,17 +625,21 @@ type inviteInsertResponse {
 
 input inviteOrderBy {
   created_at: OrderByDirection
+  first_opened_at: OrderByDirection
   id: OrderByDirection
   message: OrderByDirection
   name: OrderByDirection
+  open_count: OrderByDirection
   sent: OrderByDirection
 }
 
 input inviteUpdateInput {
   created_at: Datetime
+  first_opened_at: Datetime
   id: UUID
   message: String
   name: String
+  open_count: Int
   sent: Boolean
 }
 

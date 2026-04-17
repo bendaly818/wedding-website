@@ -16,6 +16,12 @@ const GET_INVITE_QUERY = graphql(`
   }
 `);
 
+const TRACK_OPEN_MUTATION = graphql(`
+  mutation TrackInviteOpen($id: UUID!) {
+    track_invite_open(p_invite_id: $id)
+  }
+`);
+
 const UUID_REGEX =
 	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -33,6 +39,12 @@ export const getInvite = createServerFn({ method: "GET" })
 			if (!invite) {
 				return { success: false as const, error: "Invite not found." };
 			}
+			console.log("Fetched invite details for ID:", id, "Invite:", invite);
+			// Track open — awaited so the Worker doesn't terminate before it completes
+			await supabaseGraphqlClient.request(TRACK_OPEN_MUTATION, { id }).catch((e) =>
+				console.error("Failed to track invite open:", e),
+			);
+
 			return { success: true as const, invite };
 		} catch (error) {
 			console.error(
