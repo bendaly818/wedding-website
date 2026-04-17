@@ -629,16 +629,22 @@ export function WeddingApp({ inviteId: urlId, initialData: loaderResult }: Weddi
 							Ben &amp; Brit
 						</h1>
 						<p
-							className="text-xl md:text-3xl font-serif mb-4 font-light"
+							className="text-2xl md:text-5xl font-serif mb-4 font-light"
 							style={{ color: "var(--color-blush)" }}
 						>
 							We're getting married!
 						</p>
 						<div
-							className="text-xl md:text-3xl mb-10  font-serif font-light"
+							className="text-xl md:text-2xl mb-4  font-serif font-light"
 							style={{ color: "var(--color-blush-light)" }}
 						>
-							on November 6th, 2026
+							At Bridgewater Estate on November 6th, 2026
+						</div>
+							<div
+							className="text-xl md:text-2xl mb-10  font-serif font-light"
+							style={{ color: "var(--color-blush-light)" }}
+						>
+							Arrival time 3 PM, Ceremony at 3:30 PM <br/>Reception to follow
 						</div>
 
 						{guestName ? (
@@ -667,7 +673,7 @@ export function WeddingApp({ inviteId: urlId, initialData: loaderResult }: Weddi
 								) : (
 									<>
 										<h3
-											className="text-xl md:text-3xl font-serif mb-4 font-light"
+											className="text-2xl md:text-5xl font-serif mb-4 font-light"
 											style={{ color: "var(--color-blush)" }}
 										>
 											{guestName}
@@ -675,14 +681,14 @@ export function WeddingApp({ inviteId: urlId, initialData: loaderResult }: Weddi
 
 										{invite?.message ? (
 											<p
-											className="mt-2 mb-4 text-xl md:text-3xl font-serif font-light"
+											className="mt-2 mb-4 text-xl md:text-2xl font-serif font-light"
 											style={{
 												color: "var(--color-blush-light)",
 											}}>
 												{invite.message}
 											</p>
 										) :<p
-									className="mt-2 mb-4 text-xl md:text-3xl font-serif font-light"
+									className="mt-2 mb-4 text-xl md:text-2xl font-serif font-light"
 											style={{
 												color: "var(--color-blush-light)",
 											}}
