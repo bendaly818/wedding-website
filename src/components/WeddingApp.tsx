@@ -498,6 +498,7 @@ export function WeddingApp({ inviteId: urlId, initialData: loaderResult }: Weddi
 					additional_notes: value.additional_notes,
 				});
 				setIsEditing(false);
+				document.getElementById("rsvp")?.scrollIntoView({ behavior: "smooth" });
 			} catch (error) {
 				console.error(error);
 				alert("Something went wrong saving your RSVP. Please try again.");
@@ -740,7 +741,7 @@ export function WeddingApp({ inviteId: urlId, initialData: loaderResult }: Weddi
 									</a>
 								</div>
 								<div className="pt-2 border-t" style={{ borderColor: "var(--card-border)" }}>
-									<p className="text-base opacity-60 leading-relaxed">We've kept our guest list intimate and are hosting an adults-only celebration, so we're only able to welcome the people named on each invitation — we hope you understand!</p>
+									<p className="text-base opacity-70 leading-relaxed font-bold">We've kept our guest list intimate and are hosting an adults-only celebration, so we're only able to welcome the people named on each invitation — we hope you understand!</p>
 								</div>
 							</div>
 						</div>
