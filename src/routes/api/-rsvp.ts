@@ -14,6 +14,8 @@ const GET_RSVP_QUERY = graphql(`
 		  transit
 		  physical_invite
 		  song_recommendations
+		  email
+		  additional_notes
 		}
 	  }
 	}
@@ -21,7 +23,7 @@ const GET_RSVP_QUERY = graphql(`
 `);
 
 const INSERT_RSVP_MUTATION = graphql(`
-  mutation InsertRsvp($invite_id: UUID!, $attending: Boolean!, $dietary: String, $transit: Boolean, $physical_invite: Boolean, $song_recommendations: String) {
+  mutation InsertRsvp($invite_id: UUID!, $attending: Boolean!, $dietary: String, $transit: Boolean, $physical_invite: Boolean, $song_recommendations: String, $email: String, $additional_notes: String) {
 	insertIntorsvpCollection(objects: [
 	  {
 		invite_id: $invite_id,
@@ -29,7 +31,9 @@ const INSERT_RSVP_MUTATION = graphql(`
 		dietary: $dietary,
 		transit: $transit,
 		physical_invite: $physical_invite,
-		song_recommendations: $song_recommendations
+		song_recommendations: $song_recommendations,
+		email: $email,
+		additional_notes: $additional_notes
 	  }
 	]) {
 	  records {
@@ -40,10 +44,10 @@ const INSERT_RSVP_MUTATION = graphql(`
 `);
 
 const UPDATE_RSVP_MUTATION = graphql(`
-  mutation UpdateRsvp($invite_id: UUID!, $attending: Boolean!, $dietary: String, $transit: Boolean, $physical_invite: Boolean, $song_recommendations: String) {
+  mutation UpdateRsvp($invite_id: UUID!, $attending: Boolean!, $dietary: String, $transit: Boolean, $physical_invite: Boolean, $song_recommendations: String, $email: String, $additional_notes: String) {
 	updatersvpCollection(
 	  filter: { invite_id: { eq: $invite_id } }
-	  set: { attending: $attending, dietary: $dietary, transit: $transit, physical_invite: $physical_invite, song_recommendations: $song_recommendations }
+	  set: { attending: $attending, dietary: $dietary, transit: $transit, physical_invite: $physical_invite, song_recommendations: $song_recommendations, email: $email, additional_notes: $additional_notes }
 	) {
 	  records {
 		id
@@ -77,6 +81,8 @@ export const submitRsvp = createServerFn({ method: "POST" })
 			transit,
 			physical_invite,
 			song_recommendations,
+			email,
+			additional_notes,
 		} = data;
 		try {
 			await supabaseGraphqlClient.request(INSERT_RSVP_MUTATION, {
@@ -86,6 +92,8 @@ export const submitRsvp = createServerFn({ method: "POST" })
 				transit: transit ?? null,
 				physical_invite: physical_invite ?? null,
 				song_recommendations: song_recommendations || null,
+				email: email || null,
+				additional_notes: additional_notes || null,
 			});
 			return { success: true };
 		} catch (error) {
@@ -104,6 +112,8 @@ export const updateRsvp = createServerFn({ method: "POST" })
 			transit,
 			physical_invite,
 			song_recommendations,
+			email,
+			additional_notes,
 		} = data;
 		try {
 			const result: any = await supabaseGraphqlClient.request(
@@ -115,6 +125,8 @@ export const updateRsvp = createServerFn({ method: "POST" })
 					transit: transit ?? null,
 					physical_invite: physical_invite ?? null,
 					song_recommendations: song_recommendations || null,
+					email: email || null,
+					additional_notes: additional_notes || null,
 				},
 			);
 			const updated = result?.updatersvpCollection?.records?.length ?? 0;

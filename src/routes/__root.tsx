@@ -17,8 +17,19 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: "Ben & Brit - We're Getting Married!",
+        title: "Ben & Brit — We're Getting Married!",
       },
+      {
+        name: 'description',
+        content: "Ben & Brit are getting married! November 6th, 2026 at Bridgewater Estate, Helensville, Auckland, New Zealand.",
+      },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:site_name', content: 'Ben & Brit Wedding' },
+      { property: 'og:title', content: "Ben & Brit — We're Getting Married!" },
+      { property: 'og:description', content: "Ben & Brit are getting married! November 6th, 2026 at Bridgewater Estate, Helensville, Auckland, New Zealand." },
+      { property: 'og:image', content: 'https://wedding.dalys.xyz/images/hero.jpeg' },
+      { property: 'og:url', content: 'https://wedding.dalys.xyz' },
+      { name: 'twitter:card', content: 'summary_large_image' },
     ],
     links: [
       { rel: 'icon', href: '/favicon.ico', sizes: '64x64 32x32 24x24 16x16', type: 'image/x-icon' },

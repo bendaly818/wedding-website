@@ -640,9 +640,11 @@ type inviteUpdateResponse {
 }
 
 type rsvp implements Node {
+  additional_notes: String
   attending: Boolean
   created_at: Datetime!
   dietary: String
+  email: String
   id: UUID!
   invite: invite
   invite_id: UUID
@@ -671,6 +673,7 @@ type rsvpEdge {
 }
 
 input rsvpFilter {
+  additional_notes: StringFilter
   """
   Returns true only if all its inner filters are true, otherwise returns false
   """
@@ -678,6 +681,7 @@ input rsvpFilter {
   attending: BooleanFilter
   created_at: DatetimeFilter
   dietary: StringFilter
+  email: StringFilter
   id: UUIDFilter
   invite_id: UUIDFilter
   nodeId: IDFilter
@@ -693,9 +697,11 @@ input rsvpFilter {
 }
 
 input rsvpInsertInput {
+  additional_notes: String
   attending: Boolean
   created_at: Datetime
   dietary: String
+  email: String
   id: UUID
   invite_id: UUID
   physical_invite: Boolean
@@ -711,9 +717,11 @@ type rsvpInsertResponse {
 }
 
 input rsvpOrderBy {
+  additional_notes: OrderByDirection
   attending: OrderByDirection
   created_at: OrderByDirection
   dietary: OrderByDirection
+  email: OrderByDirection
   id: OrderByDirection
   invite_id: OrderByDirection
   physical_invite: OrderByDirection
@@ -722,9 +730,11 @@ input rsvpOrderBy {
 }
 
 input rsvpUpdateInput {
+  additional_notes: String
   attending: Boolean
   created_at: Datetime
   dietary: String
+  email: String
   id: UUID
   invite_id: UUID
   physical_invite: Boolean
