@@ -629,23 +629,11 @@ export function WeddingApp({ inviteId: urlId, initialData: loaderResult }: Weddi
 							Ben &amp; Brit
 						</h1>
 						<p
-							className="text-2xl md:text-5xl font-serif mb-4 font-light"
-							style={{ color: "var(--color-blush)" }}
+							className="text-2xl md:text-5xl font-serif mb-10 font-light"
+							style={{ color: "var(--color-blush-light)" }}
 						>
 							We're getting married!
 						</p>
-						<div
-							className="text-xl md:text-2xl mb-4  font-serif font-light"
-							style={{ color: "var(--color-blush-light)" }}
-						>
-							Friday, November 6th, 2026
-						</div>
-							<div
-							className="text-xl md:text-2xl mb-10  font-serif font-light"
-							style={{ color: "var(--color-blush-light)" }}
-						>
-							Arrival time 3 PM, Ceremony at 3:30 PM <br/>Reception to follow
-						</div>
 
 						{guestName ? (
 							<div className="mb-10 inline-block">
@@ -701,19 +689,63 @@ export function WeddingApp({ inviteId: urlId, initialData: loaderResult }: Weddi
 						) : null}
 
 						<div className="flex gap-4 justify-center">
-							<Button href="#rsvp" variant="wine" onClick={startEditing}>
-								{existingRsvp ? "Edit RSVP" : "RSVP Now"}
-							</Button>
-							<Button
-								href="#travel"
+													<Button
+								href="#event-info"
 								variant="ghost"
 								className="!border-[rgba(232,207,192,0.6)] !text-[var(--color-blush-light)]"
 							>
 								Details
 							</Button>
+							<Button href="#rsvp" variant="wine" onClick={startEditing}>
+								{existingRsvp ? "Edit RSVP" : "RSVP Now"}
+							</Button>
+	
 						</div>
 					</div>
 				</PageSection>
+
+				{/* ── EVENT INFORMATION ── */}
+				{invite && (
+					<PageSection id="event-info" bg="s2">
+						<div className="page-wrap">
+							<h2
+								className="display-title text-4xl mb-10 text-center"
+								style={{ color: "var(--heading-on-bg)" }}
+							>
+								Event Information
+							</h2>
+							<div className="max-w-xl mx-auto flex flex-col gap-7">
+								<div>
+									<p className="text-xs font-bold uppercase tracking-widest mb-1 opacity-50">Date</p>
+									<p className="text-xl font-serif" style={{ color: "var(--heading-on-bg)" }}>Friday, November 6th, 2026</p>
+								</div>
+								<div>
+									<p className="text-xs font-bold uppercase tracking-widest mb-1 opacity-50">Venue</p>
+									<p className="text-xl font-serif" style={{ color: "var(--heading-on-bg)" }}>Bridgewater Estate</p>
+									<p className="text-base opacity-60 mt-0.5">561 Peak Road, Helensville, Auckland 0875</p>
+								</div>
+								<div>
+									<p className="text-xs font-bold uppercase tracking-widest mb-1 opacity-50">Schedule</p>
+									<div className="flex flex-col gap-1">
+										<p className="text-base" style={{ color: "var(--heading-on-bg)" }}><span className="font-semibold">3:00 PM</span> <span className="opacity-60">— Arrival &amp; welcome drinks</span></p>
+										<p className="text-base" style={{ color: "var(--heading-on-bg)" }}><span className="font-semibold">3:30 PM</span> <span className="opacity-60">— Ceremony</span></p>
+										<p className="text-base" style={{ color: "var(--heading-on-bg)" }}><span className="font-semibold">Evening</span> <span className="opacity-60">— Reception to follow</span></p>
+									</div>
+								</div>
+								<div>
+									<p className="text-xs font-bold uppercase tracking-widest mb-1 opacity-50">Getting There</p>
+									<p className="text-base opacity-70 leading-relaxed">The venue is around 45 minutes from central Auckland. Please note Uber doesn't operate in the area, so you'll need to pre-book a taxi or shuttle — or take advantage of our shuttle service if you've opted in.</p>
+									<a href="#travel" className="inline-block mt-2 text-base font-semibold" style={{ color: "var(--color-wine)" }}>
+										See full travel info ↓
+									</a>
+								</div>
+								<div className="pt-2 border-t" style={{ borderColor: "var(--card-border)" }}>
+									<p className="text-base opacity-60 leading-relaxed">We've kept our guest list intimate and are hosting an adults-only celebration, so we're only able to welcome the people named on each invitation — we hope you understand!</p>
+								</div>
+							</div>
+						</div>
+					</PageSection>
+				)}
 
 				{/* ── RSVP ── */}
 				<PageSection id="rsvp" bg="s1">
@@ -745,22 +777,9 @@ export function WeddingApp({ inviteId: urlId, initialData: loaderResult }: Weddi
 								</div>
 							) : guestName ? (
 								<div>
-									<h3
-										className="text-3xl mb-4"
-										style={{ color: "var(--heading-on-bg)" }}
-									>
-										Hi {guestName}!
-									</h3>
-									<p className="mb-3 font-serif text-lg"
-										style={{ color: "var(--color-wine)" }}
-									>
-										{isEditing
-											? "Update your response below."
-											: "We would love to know if you can make it to our special day."}
-									</p>
-									{!isEditing && (
-										<p className="mb-8 text-base opacity-60">
-											We've kept our guest list intimate and are hosting an adults-only celebration, so we're only able to welcome the people named on each invitation — we hope you understand!
+									{isEditing && (
+										<p className="mb-6 font-serif text-lg" style={{ color: "var(--color-wine)" }}>
+											Update your response below.
 										</p>
 									)}
 									<form

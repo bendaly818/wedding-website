@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 
 const NAV_LINKS = [
-	{ href: "#home", label: "Welcome" },
+	{ href: "#event-info", label: "Event Info" },
 	{ href: "#rsvp", label: "RSVP" },
 	{ href: "#travel", label: "Travel" },
 	{ href: "#attire", label: "Attire" },
