@@ -133,7 +133,7 @@ async function sendRsvpNotification(
 
 		await resend.emails.send({
 			from: "rsvp@dalys.xyz",
-			to: "bendaly0403@gmail.com",
+			to: ["bendaly0403@gmail.com", "brit.leen@hotmail.com"],
 			subject,
 			html: `
 				<div style="font-family:Georgia,serif;max-width:520px;margin:0 auto;color:#2a1a1a">
