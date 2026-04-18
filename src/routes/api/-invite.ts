@@ -22,8 +22,22 @@ const TRACK_OPEN_MUTATION = graphql(`
   }
 `);
 
+const TRACK_ENVELOPE_OPEN_MUTATION = graphql(`
+  mutation TrackEnvelopeOpen($id: UUID!) {
+    track_envelope_open(p_invite_id: $id)
+  }
+`);
+
 const UUID_REGEX =
 	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export const trackEnvelopeOpen = createServerFn({ method: "POST" })
+	.inputValidator((id: unknown) => id as string)
+	.handler(async ({ data: id }) => {
+		await supabaseGraphqlClient
+			.request(TRACK_ENVELOPE_OPEN_MUTATION, { id })
+			.catch((e) => console.error("Failed to track envelope open:", e));
+	});
 
 export const getInvite = createServerFn({ method: "GET" })
 	.inputValidator((id: unknown) => id as string)

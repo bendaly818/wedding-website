@@ -13,7 +13,7 @@ import FormField from "./ui/FormField";
 import PageSection from "./ui/PageSection";
 import RadioCard from "./ui/RadioCard";
 import SongPicker from "./ui/SongPicker";
-import { getInvite } from "../routes/api/-invite";
+import { getInvite, trackEnvelopeOpen } from "../routes/api/-invite";
 import { getRsvp, submitRsvp, updateRsvp } from "../routes/api/-rsvp";
 
 type InviteResult = Awaited<ReturnType<typeof getInvite>>;
@@ -108,10 +108,12 @@ function ComingSoon() {
 // ── EnvelopeOverlay ───────────────────────────────────────────────
 function EnvelopeOverlay({
 	guestName,
+	onClicked,
 	onOpened,
 	onExiting,
 }: {
 	guestName: string | null;
+	onClicked: () => void;
 	onOpened: () => void;
 	onExiting: () => void;
 }) {
@@ -140,6 +142,7 @@ function EnvelopeOverlay({
 	const handleOpen = contextSafe(() => {
 		if (phase !== "sealed") return;
 		setPhase("opening");
+		onClicked();
 
 		// Kill float and snap container to rest
 		floatTweenRef.current?.kill();
@@ -519,10 +522,16 @@ export function WeddingApp({ inviteId: urlId, initialData: loaderResult }: Weddi
 		existingRsvp && setIsEditing(true);
 	}, [form, existingRsvp]);
 
-	const handleEnvelopeOpened = useCallback(() => {
-		if (inviteId) markEnvelopeOpened(inviteId);
-		setEnvelopeOpened(true);
+	const handleEnvelopeClicked = useCallback(() => {
+		if (inviteId) {
+			markEnvelopeOpened(inviteId);
+			trackEnvelopeOpen({ data: inviteId });
+		}
 	}, [inviteId]);
+
+	const handleEnvelopeOpened = useCallback(() => {
+		setEnvelopeOpened(true);
+	}, []);
 
 	const handleEnvelopeExiting = useCallback(() => {
 		setMainVisible(true);
@@ -557,6 +566,7 @@ export function WeddingApp({ inviteId: urlId, initialData: loaderResult }: Weddi
 			{stage === "envelope" && (
 				<EnvelopeOverlay
 					guestName={guestName}
+					onClicked={handleEnvelopeClicked}
 					onOpened={handleEnvelopeOpened}
 					onExiting={handleEnvelopeExiting}
 				/>

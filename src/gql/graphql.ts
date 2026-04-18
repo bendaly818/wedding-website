@@ -200,6 +200,7 @@ export type Mutation = {
   insertIntoinviteCollection?: Maybe<InviteInsertResponse>;
   /** Adds one or more `rsvp` records to the collection */
   insertIntorsvpCollection?: Maybe<RsvpInsertResponse>;
+  track_envelope_open?: Maybe<Scalars['Opaque']['output']>;
   track_invite_open?: Maybe<Scalars['Opaque']['output']>;
   /** Updates zero or more records in the `app_settings` collection */
   updateapp_settingsCollection: App_SettingsUpdateResponse;
@@ -246,6 +247,12 @@ export type MutationInsertIntoinviteCollectionArgs = {
 /** The root type for creating and mutating data */
 export type MutationInsertIntorsvpCollectionArgs = {
   objects: Array<RsvpInsertInput>;
+};
+
+
+/** The root type for creating and mutating data */
+export type MutationTrack_Envelope_OpenArgs = {
+  p_invite_id: Scalars['UUID']['input'];
 };
 
 
@@ -507,6 +514,7 @@ export type App_SettingsUpdateResponse = {
 export type Invite = Node & {
   __typename?: 'invite';
   created_at: Scalars['Datetime']['output'];
+  envelope_opened_at?: Maybe<Scalars['Datetime']['output']>;
   first_opened_at?: Maybe<Scalars['Datetime']['output']>;
   id: Scalars['UUID']['output'];
   message?: Maybe<Scalars['String']['output']>;
@@ -553,6 +561,7 @@ export type InviteFilter = {
   /** Returns true only if all its inner filters are true, otherwise returns false */
   and?: InputMaybe<Array<InviteFilter>>;
   created_at?: InputMaybe<DatetimeFilter>;
+  envelope_opened_at?: InputMaybe<DatetimeFilter>;
   first_opened_at?: InputMaybe<DatetimeFilter>;
   id?: InputMaybe<UuidFilter>;
   message?: InputMaybe<StringFilter>;
@@ -568,6 +577,7 @@ export type InviteFilter = {
 
 export type InviteInsertInput = {
   created_at?: InputMaybe<Scalars['Datetime']['input']>;
+  envelope_opened_at?: InputMaybe<Scalars['Datetime']['input']>;
   first_opened_at?: InputMaybe<Scalars['Datetime']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   message?: InputMaybe<Scalars['String']['input']>;
@@ -586,6 +596,7 @@ export type InviteInsertResponse = {
 
 export type InviteOrderBy = {
   created_at?: InputMaybe<OrderByDirection>;
+  envelope_opened_at?: InputMaybe<OrderByDirection>;
   first_opened_at?: InputMaybe<OrderByDirection>;
   id?: InputMaybe<OrderByDirection>;
   message?: InputMaybe<OrderByDirection>;
@@ -596,6 +607,7 @@ export type InviteOrderBy = {
 
 export type InviteUpdateInput = {
   created_at?: InputMaybe<Scalars['Datetime']['input']>;
+  envelope_opened_at?: InputMaybe<Scalars['Datetime']['input']>;
   first_opened_at?: InputMaybe<Scalars['Datetime']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   message?: InputMaybe<Scalars['String']['input']>;
@@ -760,6 +772,13 @@ export type TrackInviteOpenMutationVariables = Exact<{
 
 export type TrackInviteOpenMutation = { __typename?: 'Mutation', track_invite_open?: any | null };
 
+export type TrackEnvelopeOpenMutationVariables = Exact<{
+  id: Scalars['UUID']['input'];
+}>;
+
+
+export type TrackEnvelopeOpenMutation = { __typename?: 'Mutation', track_envelope_open?: any | null };
+
 export type GetRsvpQueryVariables = Exact<{
   invite_id: Scalars['UUID']['input'];
 }>;
@@ -801,6 +820,7 @@ export const UpdateInviteSentDocument = {"kind":"Document","definitions":[{"kind
 export const AddInviteDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddInvite"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"name"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"message"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"sent"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"insertIntoinviteCollection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"objects"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"name"},"value":{"kind":"Variable","name":{"kind":"Name","value":"name"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"message"},"value":{"kind":"Variable","name":{"kind":"Name","value":"message"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"sent"},"value":{"kind":"Variable","name":{"kind":"Name","value":"sent"}}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"records"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<AddInviteMutation, AddInviteMutationVariables>;
 export const GetInviteDetailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetInviteDetail"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inviteCollection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}]}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"1"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetInviteDetailQuery, GetInviteDetailQueryVariables>;
 export const TrackInviteOpenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TrackInviteOpen"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"track_invite_open"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"p_invite_id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<TrackInviteOpenMutation, TrackInviteOpenMutationVariables>;
+export const TrackEnvelopeOpenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TrackEnvelopeOpen"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"track_envelope_open"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"p_invite_id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<TrackEnvelopeOpenMutation, TrackEnvelopeOpenMutationVariables>;
 export const GetRsvpDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetRsvp"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"invite_id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rsvpCollection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"invite_id"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"invite_id"}}}]}}]}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"1"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"attending"}},{"kind":"Field","name":{"kind":"Name","value":"dietary"}},{"kind":"Field","name":{"kind":"Name","value":"transit"}},{"kind":"Field","name":{"kind":"Name","value":"physical_invite"}},{"kind":"Field","name":{"kind":"Name","value":"song_recommendations"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"additional_notes"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetRsvpQuery, GetRsvpQueryVariables>;
 export const InsertRsvpDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"InsertRsvp"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"invite_id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"attending"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"dietary"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"transit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"physical_invite"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"song_recommendations"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"email"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"additional_notes"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"insertIntorsvpCollection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"objects"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"invite_id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"invite_id"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"attending"},"value":{"kind":"Variable","name":{"kind":"Name","value":"attending"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"dietary"},"value":{"kind":"Variable","name":{"kind":"Name","value":"dietary"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"transit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"transit"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"physical_invite"},"value":{"kind":"Variable","name":{"kind":"Name","value":"physical_invite"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"song_recommendations"},"value":{"kind":"Variable","name":{"kind":"Name","value":"song_recommendations"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"email"},"value":{"kind":"Variable","name":{"kind":"Name","value":"email"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"additional_notes"},"value":{"kind":"Variable","name":{"kind":"Name","value":"additional_notes"}}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"records"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<InsertRsvpMutation, InsertRsvpMutationVariables>;
 export const UpdateRsvpDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateRsvp"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"invite_id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"attending"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"dietary"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"transit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"physical_invite"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"song_recommendations"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"email"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"additional_notes"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updatersvpCollection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"invite_id"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"invite_id"}}}]}}]}},{"kind":"Argument","name":{"kind":"Name","value":"set"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"attending"},"value":{"kind":"Variable","name":{"kind":"Name","value":"attending"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"dietary"},"value":{"kind":"Variable","name":{"kind":"Name","value":"dietary"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"transit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"transit"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"physical_invite"},"value":{"kind":"Variable","name":{"kind":"Name","value":"physical_invite"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"song_recommendations"},"value":{"kind":"Variable","name":{"kind":"Name","value":"song_recommendations"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"email"},"value":{"kind":"Variable","name":{"kind":"Name","value":"email"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"additional_notes"},"value":{"kind":"Variable","name":{"kind":"Name","value":"additional_notes"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"records"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateRsvpMutation, UpdateRsvpMutationVariables>;
@@ -997,6 +1017,7 @@ export type Mutation = {
   insertIntoinviteCollection?: Maybe<InviteInsertResponse>;
   /** Adds one or more `rsvp` records to the collection */
   insertIntorsvpCollection?: Maybe<RsvpInsertResponse>;
+  track_envelope_open?: Maybe<Scalars['Opaque']['output']>;
   track_invite_open?: Maybe<Scalars['Opaque']['output']>;
   /** Updates zero or more records in the `app_settings` collection */
   updateapp_settingsCollection: App_SettingsUpdateResponse;
@@ -1043,6 +1064,12 @@ export type MutationInsertIntoinviteCollectionArgs = {
 /** The root type for creating and mutating data */
 export type MutationInsertIntorsvpCollectionArgs = {
   objects: Array<RsvpInsertInput>;
+};
+
+
+/** The root type for creating and mutating data */
+export type MutationTrack_Envelope_OpenArgs = {
+  p_invite_id: Scalars['UUID']['input'];
 };
 
 
@@ -1304,6 +1331,7 @@ export type App_SettingsUpdateResponse = {
 export type Invite = Node & {
   __typename?: 'invite';
   created_at: Scalars['Datetime']['output'];
+  envelope_opened_at?: Maybe<Scalars['Datetime']['output']>;
   first_opened_at?: Maybe<Scalars['Datetime']['output']>;
   id: Scalars['UUID']['output'];
   message?: Maybe<Scalars['String']['output']>;
@@ -1350,6 +1378,7 @@ export type InviteFilter = {
   /** Returns true only if all its inner filters are true, otherwise returns false */
   and?: InputMaybe<Array<InviteFilter>>;
   created_at?: InputMaybe<DatetimeFilter>;
+  envelope_opened_at?: InputMaybe<DatetimeFilter>;
   first_opened_at?: InputMaybe<DatetimeFilter>;
   id?: InputMaybe<UuidFilter>;
   message?: InputMaybe<StringFilter>;
@@ -1365,6 +1394,7 @@ export type InviteFilter = {
 
 export type InviteInsertInput = {
   created_at?: InputMaybe<Scalars['Datetime']['input']>;
+  envelope_opened_at?: InputMaybe<Scalars['Datetime']['input']>;
   first_opened_at?: InputMaybe<Scalars['Datetime']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   message?: InputMaybe<Scalars['String']['input']>;
@@ -1383,6 +1413,7 @@ export type InviteInsertResponse = {
 
 export type InviteOrderBy = {
   created_at?: InputMaybe<OrderByDirection>;
+  envelope_opened_at?: InputMaybe<OrderByDirection>;
   first_opened_at?: InputMaybe<OrderByDirection>;
   id?: InputMaybe<OrderByDirection>;
   message?: InputMaybe<OrderByDirection>;
@@ -1393,6 +1424,7 @@ export type InviteOrderBy = {
 
 export type InviteUpdateInput = {
   created_at?: InputMaybe<Scalars['Datetime']['input']>;
+  envelope_opened_at?: InputMaybe<Scalars['Datetime']['input']>;
   first_opened_at?: InputMaybe<Scalars['Datetime']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   message?: InputMaybe<Scalars['String']['input']>;

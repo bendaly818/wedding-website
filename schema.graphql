@@ -239,6 +239,7 @@ type Mutation {
   insertIntoinviteCollection(objects: [inviteInsertInput!]!): inviteInsertResponse
   """Adds one or more `rsvp` records to the collection"""
   insertIntorsvpCollection(objects: [rsvpInsertInput!]!): rsvpInsertResponse
+  track_envelope_open(p_invite_id: UUID!): Opaque
   track_invite_open(p_invite_id: UUID!): Opaque
   """Updates zero or more records in the `app_settings` collection"""
   updateapp_settingsCollection(
@@ -540,6 +541,7 @@ type app_settingsUpdateResponse {
 
 type invite implements Node {
   created_at: Datetime!
+  envelope_opened_at: Datetime
   first_opened_at: Datetime
   id: UUID!
   message: String
@@ -591,6 +593,7 @@ input inviteFilter {
   """
   and: [inviteFilter!]
   created_at: DatetimeFilter
+  envelope_opened_at: DatetimeFilter
   first_opened_at: DatetimeFilter
   id: UUIDFilter
   message: StringFilter
@@ -608,6 +611,7 @@ input inviteFilter {
 
 input inviteInsertInput {
   created_at: Datetime
+  envelope_opened_at: Datetime
   first_opened_at: Datetime
   id: UUID
   message: String
@@ -625,6 +629,7 @@ type inviteInsertResponse {
 
 input inviteOrderBy {
   created_at: OrderByDirection
+  envelope_opened_at: OrderByDirection
   first_opened_at: OrderByDirection
   id: OrderByDirection
   message: OrderByDirection
@@ -635,6 +640,7 @@ input inviteOrderBy {
 
 input inviteUpdateInput {
   created_at: Datetime
+  envelope_opened_at: Datetime
   first_opened_at: Datetime
   id: UUID
   message: String
