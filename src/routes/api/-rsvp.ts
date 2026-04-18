@@ -100,9 +100,23 @@ async function sendRsvpNotification(
 			? `RSVP updated: ${guestName}`
 			: `New RSVP: ${guestName}`;
 
-		const rows = [
+		let songsHtml = "—";
+		if (data.song_recommendations) {
+			try {
+				const songs: Array<{ name: string; artist: string }> = JSON.parse(data.song_recommendations);
+				if (songs.length > 0) {
+					songsHtml = songs
+						.map((s, i) => `${i + 1}. <strong>${s.name}</strong> — ${s.artist}`)
+						.join("<br>");
+				}
+			} catch {
+				songsHtml = data.song_recommendations;
+			}
+		}
+
+		const rows: [string, string][] = [
 			["Attending", data.attending ? "Yes 🎉" : "No"],
-			["Songs", data.song_recommendations || "—"],
+			["Songs", songsHtml],
 			["Dietary", data.dietary || "—"],
 			["Notes", data.additional_notes || "—"],
 			["Guest email", data.email || "—"],
@@ -113,7 +127,7 @@ async function sendRsvpNotification(
 		const tableRows = rows
 			.map(
 				([label, value]) =>
-					`<tr><td style="padding:6px 12px;font-weight:600;color:#6b1535;white-space:nowrap">${label}</td><td style="padding:6px 12px">${value}</td></tr>`,
+					`<tr><td style="padding:6px 12px;font-weight:600;color:#6b1535;white-space:nowrap;vertical-align:top">${label}</td><td style="padding:6px 12px">${value}</td></tr>`,
 			)
 			.join("");
 
