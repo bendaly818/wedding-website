@@ -1,4 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
+import { env } from "cloudflare:workers";
+import { Resend } from "resend";
 import { graphql } from "#/gql";
 import type { RsvpInsertInput, RsvpUpdateInput } from "#/gql/graphql";
 import { supabaseGraphqlClient } from "#/lib/supabase-graphql";
@@ -16,6 +18,18 @@ const GET_RSVP_QUERY = graphql(`
 		  song_recommendations
 		  email
 		  additional_notes
+		}
+	  }
+	}
+  }
+`);
+
+const GET_INVITE_NAME_QUERY = graphql(`
+  query GetInviteName($id: UUID!) {
+	inviteCollection(filter: { id: { eq: $id } }, first: 1) {
+	  edges {
+		node {
+		  name
 		}
 	  }
 	}
@@ -56,6 +70,73 @@ const UPDATE_RSVP_MUTATION = graphql(`
   }
 `);
 
+async function getGuestName(invite_id: string): Promise<string> {
+	try {
+		const result = await supabaseGraphqlClient.request(GET_INVITE_NAME_QUERY, { id: invite_id });
+		return result?.inviteCollection?.edges?.[0]?.node?.name ?? "Unknown guest";
+	} catch {
+		return "Unknown guest";
+	}
+}
+
+async function sendRsvpNotification(
+	invite_id: string,
+	data: {
+		attending: boolean;
+		dietary?: string | null;
+		song_recommendations?: string | null;
+		email?: string | null;
+		additional_notes?: string | null;
+		transit?: boolean | null;
+		physical_invite?: boolean | null;
+	},
+	isUpdate: boolean,
+) {
+	try {
+		const resend = new Resend(env.RESEND_API_KEY);
+		const guestName = await getGuestName(invite_id);
+
+		const subject = isUpdate
+			? `RSVP updated: ${guestName}`
+			: `New RSVP: ${guestName}`;
+
+		const rows = [
+			["Attending", data.attending ? "Yes 🎉" : "No"],
+			["Songs", data.song_recommendations || "—"],
+			["Dietary", data.dietary || "—"],
+			["Notes", data.additional_notes || "—"],
+			["Guest email", data.email || "—"],
+			["Shuttle", data.transit === true ? "Yes" : data.transit === false ? "No" : "—"],
+			["Physical invite", data.physical_invite === true ? "Yes" : data.physical_invite === false ? "No" : "—"],
+		];
+
+		const tableRows = rows
+			.map(
+				([label, value]) =>
+					`<tr><td style="padding:6px 12px;font-weight:600;color:#6b1535;white-space:nowrap">${label}</td><td style="padding:6px 12px">${value}</td></tr>`,
+			)
+			.join("");
+
+		await resend.emails.send({
+			from: "rsvp@dalys.xyz",
+			to: "bendaly0403@gmail.com",
+			subject,
+			html: `
+				<div style="font-family:Georgia,serif;max-width:520px;margin:0 auto;color:#2a1a1a">
+					<h2 style="color:#6b1535;margin-bottom:4px">${subject}</h2>
+					<p style="color:#888;margin-top:0;font-size:13px">${isUpdate ? "They updated their RSVP." : "A new RSVP just came in."}</p>
+					<table style="border-collapse:collapse;width:100%;background:#faf7f4;border-radius:8px;overflow:hidden">
+						${tableRows}
+					</table>
+				</div>
+			`,
+		});
+	} catch (error) {
+		// Non-fatal — log but don't fail the RSVP submission
+		console.error("Failed to send RSVP notification email:", error);
+	}
+}
+
 export const getRsvp = createServerFn({ method: "GET" })
 	.inputValidator((invite_id: unknown) => invite_id as string)
 	.handler(async ({ data: invite_id }) => {
@@ -95,6 +176,11 @@ export const submitRsvp = createServerFn({ method: "POST" })
 				email: email || null,
 				additional_notes: additional_notes || null,
 			});
+			await sendRsvpNotification(
+				invite_id,
+				{ attending: !!attending, dietary, transit, physical_invite, song_recommendations, email, additional_notes },
+				false,
+			);
 			return { success: true };
 		} catch (error) {
 			console.error("Failed to save RSVP:", error);
@@ -134,6 +220,11 @@ export const updateRsvp = createServerFn({ method: "POST" })
 				console.error("updateRsvp: no rows matched", invite_id);
 				return { success: false, error: "RSVP record not found." };
 			}
+			await sendRsvpNotification(
+				invite_id,
+				{ attending: !!attending, dietary, transit, physical_invite, song_recommendations, email, additional_notes },
+				true,
+			);
 			return { success: true };
 		} catch (error) {
 			console.error("Failed to update RSVP:", error);

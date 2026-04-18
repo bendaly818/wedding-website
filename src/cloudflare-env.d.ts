@@ -7,5 +7,6 @@ declare namespace Cloudflare {
 		SPOTIFY_REDIRECT_URI: string;
 		SUPABASE_URL: string;
 		SUPABASE_SECRET_KEY: string;
+		RESEND_API_KEY: string;
 	}
 }
