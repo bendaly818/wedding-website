@@ -11,9 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as PrintSeatingRouteImport } from './routes/print/seating'
+import { Route as PrintInviteIdRouteImport } from './routes/print/$inviteId'
 import { Route as IInviteIdRouteImport } from './routes/i/$inviteId'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as AdminSpotifyCallbackRouteImport } from './routes/admin/spotify-callback'
+import { Route as AdminSeatingRouteImport } from './routes/admin/seating'
 import { Route as AdminResetPasswordRouteImport } from './routes/admin/reset-password'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminForgotPasswordRouteImport } from './routes/admin/forgot-password'
@@ -26,6 +29,16 @@ const IndexRoute = IndexRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrintSeatingRoute = PrintSeatingRouteImport.update({
+  id: '/print/seating',
+  path: '/print/seating',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrintInviteIdRoute = PrintInviteIdRouteImport.update({
+  id: '/print/$inviteId',
+  path: '/print/$inviteId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IInviteIdRoute = IInviteIdRouteImport.update({
@@ -41,6 +54,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
 const AdminSpotifyCallbackRoute = AdminSpotifyCallbackRouteImport.update({
   id: '/admin/spotify-callback',
   path: '/admin/spotify-callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSeatingRoute = AdminSeatingRouteImport.update({
+  id: '/admin/seating',
+  path: '/admin/seating',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminResetPasswordRoute = AdminResetPasswordRouteImport.update({
@@ -64,9 +82,12 @@ export interface FileRoutesByFullPath {
   '/admin/forgot-password': typeof AdminForgotPasswordRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/reset-password': typeof AdminResetPasswordRoute
+  '/admin/seating': typeof AdminSeatingRoute
   '/admin/spotify-callback': typeof AdminSpotifyCallbackRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/i/$inviteId': typeof IInviteIdRoute
+  '/print/$inviteId': typeof PrintInviteIdRoute
+  '/print/seating': typeof PrintSeatingRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -74,9 +95,12 @@ export interface FileRoutesByTo {
   '/admin/forgot-password': typeof AdminForgotPasswordRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/reset-password': typeof AdminResetPasswordRoute
+  '/admin/seating': typeof AdminSeatingRoute
   '/admin/spotify-callback': typeof AdminSpotifyCallbackRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/i/$inviteId': typeof IInviteIdRoute
+  '/print/$inviteId': typeof PrintInviteIdRoute
+  '/print/seating': typeof PrintSeatingRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
@@ -85,9 +109,12 @@ export interface FileRoutesById {
   '/admin/forgot-password': typeof AdminForgotPasswordRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/reset-password': typeof AdminResetPasswordRoute
+  '/admin/seating': typeof AdminSeatingRoute
   '/admin/spotify-callback': typeof AdminSpotifyCallbackRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/i/$inviteId': typeof IInviteIdRoute
+  '/print/$inviteId': typeof PrintInviteIdRoute
+  '/print/seating': typeof PrintSeatingRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -97,9 +124,12 @@ export interface FileRouteTypes {
     | '/admin/forgot-password'
     | '/admin/login'
     | '/admin/reset-password'
+    | '/admin/seating'
     | '/admin/spotify-callback'
     | '/auth/callback'
     | '/i/$inviteId'
+    | '/print/$inviteId'
+    | '/print/seating'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -107,9 +137,12 @@ export interface FileRouteTypes {
     | '/admin/forgot-password'
     | '/admin/login'
     | '/admin/reset-password'
+    | '/admin/seating'
     | '/admin/spotify-callback'
     | '/auth/callback'
     | '/i/$inviteId'
+    | '/print/$inviteId'
+    | '/print/seating'
     | '/admin'
   id:
     | '__root__'
@@ -117,9 +150,12 @@ export interface FileRouteTypes {
     | '/admin/forgot-password'
     | '/admin/login'
     | '/admin/reset-password'
+    | '/admin/seating'
     | '/admin/spotify-callback'
     | '/auth/callback'
     | '/i/$inviteId'
+    | '/print/$inviteId'
+    | '/print/seating'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -128,9 +164,12 @@ export interface RootRouteChildren {
   AdminForgotPasswordRoute: typeof AdminForgotPasswordRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminResetPasswordRoute: typeof AdminResetPasswordRoute
+  AdminSeatingRoute: typeof AdminSeatingRoute
   AdminSpotifyCallbackRoute: typeof AdminSpotifyCallbackRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   IInviteIdRoute: typeof IInviteIdRoute
+  PrintInviteIdRoute: typeof PrintInviteIdRoute
+  PrintSeatingRoute: typeof PrintSeatingRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -148,6 +187,20 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/print/seating': {
+      id: '/print/seating'
+      path: '/print/seating'
+      fullPath: '/print/seating'
+      preLoaderRoute: typeof PrintSeatingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/print/$inviteId': {
+      id: '/print/$inviteId'
+      path: '/print/$inviteId'
+      fullPath: '/print/$inviteId'
+      preLoaderRoute: typeof PrintInviteIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/i/$inviteId': {
@@ -169,6 +222,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/spotify-callback'
       fullPath: '/admin/spotify-callback'
       preLoaderRoute: typeof AdminSpotifyCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/seating': {
+      id: '/admin/seating'
+      path: '/admin/seating'
+      fullPath: '/admin/seating'
+      preLoaderRoute: typeof AdminSeatingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/reset-password': {
@@ -200,9 +260,12 @@ const rootRouteChildren: RootRouteChildren = {
   AdminForgotPasswordRoute: AdminForgotPasswordRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminResetPasswordRoute: AdminResetPasswordRoute,
+  AdminSeatingRoute: AdminSeatingRoute,
   AdminSpotifyCallbackRoute: AdminSpotifyCallbackRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   IInviteIdRoute: IInviteIdRoute,
+  PrintInviteIdRoute: PrintInviteIdRoute,
+  PrintSeatingRoute: PrintSeatingRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport

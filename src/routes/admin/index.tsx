@@ -8,20 +8,24 @@ import type { GetAllInvitesQuery } from "#/gql/graphql";
 import { createSupabaseServerClient } from "../../lib/supabase";
 import { supabaseGraphqlClient } from "../../lib/supabase-graphql";
 import {
+	disconnectSpotify,
 	getAllSongs,
 	getSpotifyAuthUrl,
 	getSpotifyConnectionStatus,
 	syncSpotifyPlaylist,
-	disconnectSpotify,
 } from "../api/-spotify-playlist";
 
 /** Authenticates the request via Supabase Auth server (safe, not cookie-only). */
 async function getAuthContext() {
 	const supabase = await createSupabaseServerClient(getRequest());
-	const { data: { user } } = await supabase.auth.getUser();
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
 	// Session is needed only for its access_token (used in GraphQL headers).
 	// getUser() already validated the token; we just need the token string.
-	const { data: { session } } = await supabase.auth.getSession();
+	const {
+		data: { session },
+	} = await supabase.auth.getSession();
 	return { user, accessToken: session?.access_token ?? null };
 }
 
@@ -94,9 +98,7 @@ const UPDATE_INVITE_SENT_MUTATION = graphql(`
 `);
 
 export const updateInviteSent = createServerFn({ method: "POST" })
-	.inputValidator(
-		(data: unknown) => data as { id: string; sent: boolean },
-	)
+	.inputValidator((data: unknown) => data as { id: string; sent: boolean })
 	.handler(async ({ data }) => {
 		const { user, accessToken } = await getAuthContext();
 		if (!user) throw new Error("Unauthorized");
@@ -186,7 +188,12 @@ type Invite = {
 	} | null;
 };
 
-type Song = { id: string; name: string; artist: string; albumArt: string | null };
+type Song = {
+	id: string;
+	name: string;
+	artist: string;
+	albumArt: string | null;
+};
 
 // ── Sub-components ─────────────────────────────────────────────────
 
@@ -246,13 +253,19 @@ function RsvpModal({
 		>
 			<div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
 				{/* Header */}
-				<div className="px-8 pt-8 pb-6" style={{ background: "var(--section-s1)" }}>
+				<div
+					className="px-8 pt-8 pb-6"
+					style={{ background: "var(--section-s1)" }}
+				>
 					<div className="flex items-start justify-between gap-4">
 						<div>
 							<p className="text-xs uppercase tracking-widest font-bold text-gray-400 mb-1">
 								RSVP Details
 							</p>
-							<h2 className="text-2xl font-serif" style={{ color: "var(--color-wine)" }}>
+							<h2
+								className="text-2xl font-serif"
+								style={{ color: "var(--color-wine)" }}
+							>
 								{invite.name}
 							</h2>
 						</div>
@@ -269,26 +282,41 @@ function RsvpModal({
 				{/* Body */}
 				<div className="px-8 py-6 flex flex-col gap-5">
 					{!rsvp ? (
-						<p className="text-gray-400 text-center py-4">No RSVP submitted yet.</p>
+						<p className="text-gray-400 text-center py-4">
+							No RSVP submitted yet.
+						</p>
 					) : (
 						<>
 							<div className="grid grid-cols-2 gap-4">
 								<div className="flex flex-col gap-1">
-									<p className="text-xs uppercase tracking-widest font-bold text-gray-400">Attending</p>
+									<p className="text-xs uppercase tracking-widest font-bold text-gray-400">
+										Attending
+									</p>
 									<BoolCell val={rsvp.attending} />
 								</div>
 								<div className="flex flex-col gap-1">
-									<p className="text-xs uppercase tracking-widest font-bold text-gray-400">Bus Transfer</p>
+									<p className="text-xs uppercase tracking-widest font-bold text-gray-400">
+										Bus Transfer
+									</p>
 									<BoolCell val={rsvp.transit} />
 								</div>
 								<div className="flex flex-col gap-1">
-									<p className="text-xs uppercase tracking-widest font-bold text-gray-400">Physical Invite</p>
+									<p className="text-xs uppercase tracking-widest font-bold text-gray-400">
+										Physical Invite
+									</p>
 									<BoolCell val={rsvp.physical_invite} />
 								</div>
 								<div className="flex flex-col gap-1">
-									<p className="text-xs uppercase tracking-widest font-bold text-gray-400">Dietary</p>
-									<p className="text-base font-medium" style={{ color: "var(--color-wine-dark)" }}>
-										{rsvp.dietary || <span className="text-gray-300">None</span>}
+									<p className="text-xs uppercase tracking-widest font-bold text-gray-400">
+										Dietary
+									</p>
+									<p
+										className="text-base font-medium"
+										style={{ color: "var(--color-wine-dark)" }}
+									>
+										{rsvp.dietary || (
+											<span className="text-gray-300">None</span>
+										)}
 									</p>
 								</div>
 							</div>
@@ -305,15 +333,24 @@ function RsvpModal({
 												className="flex items-center gap-3 bg-[color:var(--section-s1)] rounded-xl px-3 py-2"
 											>
 												{song.albumArt ? (
-													<img src={song.albumArt} alt="" className="w-9 h-9 rounded object-cover flex-shrink-0" />
+													<img
+														src={song.albumArt}
+														alt=""
+														className="w-9 h-9 rounded object-cover flex-shrink-0"
+													/>
 												) : (
 													<div className="w-9 h-9 rounded flex-shrink-0 bg-gray-100" />
 												)}
 												<div className="flex-1 min-w-0">
-													<p className="text-sm font-semibold truncate" style={{ color: "var(--color-wine-dark)" }}>
+													<p
+														className="text-sm font-semibold truncate"
+														style={{ color: "var(--color-wine-dark)" }}
+													>
 														{song.name}
 													</p>
-													<p className="text-xs text-gray-400 truncate">{song.artist}</p>
+													<p className="text-xs text-gray-400 truncate">
+														{song.artist}
+													</p>
 												</div>
 											</div>
 										))}
@@ -383,7 +420,8 @@ function PlaylistPanel() {
 						DJ Playlist
 					</h2>
 					<p className="text-sm text-gray-400 mt-0.5">
-						{songs.length} unique track{songs.length !== 1 ? "s" : ""} across all RSVPs
+						{songs.length} unique track{songs.length !== 1 ? "s" : ""} across
+						all RSVPs
 					</p>
 				</div>
 				<div className="flex items-center gap-3">
@@ -395,7 +433,10 @@ function PlaylistPanel() {
 									target="_blank"
 									rel="noreferrer"
 									className="flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-bold uppercase tracking-widest transition-colors hover:bg-gray-50"
-									style={{ color: "var(--color-wine)", borderColor: "var(--card-border)" }}
+									style={{
+										color: "var(--color-wine)",
+										borderColor: "var(--card-border)",
+									}}
 								>
 									<SpotifyIcon />
 									Open Playlist
@@ -406,7 +447,10 @@ function PlaylistPanel() {
 								onClick={() => disconnectMutation.mutate()}
 								disabled={disconnectMutation.isPending}
 								className="px-4 py-2 rounded-xl text-sm font-bold uppercase tracking-widest transition-opacity hover:opacity-80 disabled:opacity-50"
-								style={{ color: "var(--color-wine)", background: "var(--section-s2)" }}
+								style={{
+									color: "var(--color-wine)",
+									background: "var(--section-s2)",
+								}}
 							>
 								{disconnectMutation.isPending ? "Disconnecting…" : "Disconnect"}
 							</button>
@@ -486,7 +530,9 @@ function PlaylistPanel() {
 									>
 										{song.name}
 									</p>
-									<p className="text-xs text-gray-400 truncate">{song.artist}</p>
+									<p className="text-xs text-gray-400 truncate">
+										{song.artist}
+									</p>
 								</div>
 							</div>
 						))}
@@ -682,7 +728,9 @@ function AdminDashboard() {
 									className="w-4 h-4 rounded"
 									style={{ accentColor: "var(--color-wine)" }}
 								/>
-								<span className="text-sm font-medium text-gray-600">Mark as sent</span>
+								<span className="text-sm font-medium text-gray-600">
+									Mark as sent
+								</span>
 							</label>
 							<button
 								disabled={createInvite.isPending}
@@ -716,9 +764,18 @@ function AdminDashboard() {
 										}
 							}
 						>
-							{tab === "invites" ? `Invites (${invites.length})` : "DJ Playlist"}
+							{tab === "invites"
+								? `Invites (${invites.length})`
+								: "DJ Playlist"}
 						</button>
 					))}
+					<a
+						href="/admin/seating"
+						className="px-5 py-2 rounded-xl text-sm font-bold uppercase tracking-wider transition-all"
+						style={{ color: "var(--color-wine)", background: "transparent" }}
+					>
+						Seating Plan
+					</a>
 				</div>
 
 				{/* Invites table */}
@@ -767,7 +824,9 @@ function AdminDashboard() {
 												<tr
 													key={invite.id}
 													className="transition-colors hover:bg-[color:var(--section-s1)]"
-													style={{ borderBottom: "1px solid var(--section-s2)" }}
+													style={{
+														borderBottom: "1px solid var(--section-s2)",
+													}}
 												>
 													<td className="px-6 py-4">
 														<p
@@ -799,9 +858,18 @@ function AdminDashboard() {
 													<td className="px-6 py-4 text-center">
 														<button
 															type="button"
-															title={invite.sent ? "Mark as not sent" : "Mark as sent"}
+															title={
+																invite.sent
+																	? "Mark as not sent"
+																	: "Mark as sent"
+															}
 															disabled={toggleSent.isPending}
-															onClick={() => toggleSent.mutate({ id: invite.id, sent: !invite.sent })}
+															onClick={() =>
+																toggleSent.mutate({
+																	id: invite.id,
+																	sent: !invite.sent,
+																})
+															}
 															className="text-lg transition-opacity hover:opacity-70 disabled:opacity-40"
 														>
 															{invite.sent ? (
@@ -815,7 +883,12 @@ function AdminDashboard() {
 														{invite.first_opened_at ? (
 															<div className="flex flex-col">
 																<span className="text-xs font-medium text-gray-600">
-																	{new Date(invite.first_opened_at).toLocaleDateString("en-NZ", { day: "numeric", month: "short" })}
+																	{new Date(
+																		invite.first_opened_at,
+																	).toLocaleDateString("en-NZ", {
+																		day: "numeric",
+																		month: "short",
+																	})}
 																</span>
 																{(invite.open_count ?? 0) > 1 && (
 																	<span className="text-xs text-gray-400">
@@ -831,7 +904,9 @@ function AdminDashboard() {
 														<div className="flex items-center gap-2">
 															<button
 																type="button"
-																onClick={() => setSelectedInvite(invite as Invite)}
+																onClick={() =>
+																	setSelectedInvite(invite as Invite)
+																}
 																className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors hover:opacity-80"
 																style={{
 																	background: "var(--section-s2)",

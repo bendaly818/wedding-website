@@ -215,6 +215,15 @@ type Mutation {
     """Restricts the mutation's impact to records matching the criteria"""
     filter: app_settingsFilter
   ): app_settingsDeleteResponse!
+  """Deletes zero or more records from the `guest` collection"""
+  deleteFromguestCollection(
+    """
+    The maximum number of records in the collection permitted to be affected
+    """
+    atMost: Int! = 1
+    """Restricts the mutation's impact to records matching the criteria"""
+    filter: guestFilter
+  ): guestDeleteResponse!
   """Deletes zero or more records from the `invite` collection"""
   deleteFrominviteCollection(
     """
@@ -233,12 +242,36 @@ type Mutation {
     """Restricts the mutation's impact to records matching the criteria"""
     filter: rsvpFilter
   ): rsvpDeleteResponse!
+  """Deletes zero or more records from the `seat_assignment` collection"""
+  deleteFromseat_assignmentCollection(
+    """
+    The maximum number of records in the collection permitted to be affected
+    """
+    atMost: Int! = 1
+    """Restricts the mutation's impact to records matching the criteria"""
+    filter: seat_assignmentFilter
+  ): seat_assignmentDeleteResponse!
+  """Deletes zero or more records from the `seating_element` collection"""
+  deleteFromseating_elementCollection(
+    """
+    The maximum number of records in the collection permitted to be affected
+    """
+    atMost: Int! = 1
+    """Restricts the mutation's impact to records matching the criteria"""
+    filter: seating_elementFilter
+  ): seating_elementDeleteResponse!
   """Adds one or more `app_settings` records to the collection"""
   insertIntoapp_settingsCollection(objects: [app_settingsInsertInput!]!): app_settingsInsertResponse
+  """Adds one or more `guest` records to the collection"""
+  insertIntoguestCollection(objects: [guestInsertInput!]!): guestInsertResponse
   """Adds one or more `invite` records to the collection"""
   insertIntoinviteCollection(objects: [inviteInsertInput!]!): inviteInsertResponse
   """Adds one or more `rsvp` records to the collection"""
   insertIntorsvpCollection(objects: [rsvpInsertInput!]!): rsvpInsertResponse
+  """Adds one or more `seat_assignment` records to the collection"""
+  insertIntoseat_assignmentCollection(objects: [seat_assignmentInsertInput!]!): seat_assignmentInsertResponse
+  """Adds one or more `seating_element` records to the collection"""
+  insertIntoseating_elementCollection(objects: [seating_elementInsertInput!]!): seating_elementInsertResponse
   track_envelope_open(p_invite_id: UUID!): Opaque
   track_invite_open(p_invite_id: UUID!): Opaque
   """Updates zero or more records in the `app_settings` collection"""
@@ -254,6 +287,19 @@ type Mutation {
     """
     set: app_settingsUpdateInput!
   ): app_settingsUpdateResponse!
+  """Updates zero or more records in the `guest` collection"""
+  updateguestCollection(
+    """
+    The maximum number of records in the collection permitted to be affected
+    """
+    atMost: Int! = 1
+    """Restricts the mutation's impact to records matching the criteria"""
+    filter: guestFilter
+    """
+    Fields that are set will be updated for all records matching the `filter`
+    """
+    set: guestUpdateInput!
+  ): guestUpdateResponse!
   """Updates zero or more records in the `invite` collection"""
   updateinviteCollection(
     """
@@ -280,6 +326,32 @@ type Mutation {
     """
     set: rsvpUpdateInput!
   ): rsvpUpdateResponse!
+  """Updates zero or more records in the `seat_assignment` collection"""
+  updateseat_assignmentCollection(
+    """
+    The maximum number of records in the collection permitted to be affected
+    """
+    atMost: Int! = 1
+    """Restricts the mutation's impact to records matching the criteria"""
+    filter: seat_assignmentFilter
+    """
+    Fields that are set will be updated for all records matching the `filter`
+    """
+    set: seat_assignmentUpdateInput!
+  ): seat_assignmentUpdateResponse!
+  """Updates zero or more records in the `seating_element` collection"""
+  updateseating_elementCollection(
+    """
+    The maximum number of records in the collection permitted to be affected
+    """
+    atMost: Int! = 1
+    """Restricts the mutation's impact to records matching the criteria"""
+    filter: seating_elementFilter
+    """
+    Fields that are set will be updated for all records matching the `filter`
+    """
+    set: seating_elementUpdateInput!
+  ): seating_elementUpdateResponse!
 }
 
 interface Node {
@@ -338,6 +410,25 @@ type Query {
     """Sort order to apply to the collection"""
     orderBy: [app_settingsOrderBy!]
   ): app_settingsConnection
+  """A pagable collection of type `guest`"""
+  guestCollection(
+    """Query values in the collection after the provided cursor"""
+    after: Cursor
+    """Query values in the collection before the provided cursor"""
+    before: Cursor
+    """Filters to apply to the results set when querying from the collection"""
+    filter: guestFilter
+    """Query the first `n` records in the collection"""
+    first: Int
+    """Query the last `n` records in the collection"""
+    last: Int
+    """
+    Skip n values from the after cursor. Alternative to cursor pagination. Backward pagination not supported.
+    """
+    offset: Int
+    """Sort order to apply to the collection"""
+    orderBy: [guestOrderBy!]
+  ): guestConnection
   """A pagable collection of type `invite`"""
   inviteCollection(
     """Query values in the collection after the provided cursor"""
@@ -381,6 +472,44 @@ type Query {
     """Sort order to apply to the collection"""
     orderBy: [rsvpOrderBy!]
   ): rsvpConnection
+  """A pagable collection of type `seat_assignment`"""
+  seat_assignmentCollection(
+    """Query values in the collection after the provided cursor"""
+    after: Cursor
+    """Query values in the collection before the provided cursor"""
+    before: Cursor
+    """Filters to apply to the results set when querying from the collection"""
+    filter: seat_assignmentFilter
+    """Query the first `n` records in the collection"""
+    first: Int
+    """Query the last `n` records in the collection"""
+    last: Int
+    """
+    Skip n values from the after cursor. Alternative to cursor pagination. Backward pagination not supported.
+    """
+    offset: Int
+    """Sort order to apply to the collection"""
+    orderBy: [seat_assignmentOrderBy!]
+  ): seat_assignmentConnection
+  """A pagable collection of type `seating_element`"""
+  seating_elementCollection(
+    """Query values in the collection after the provided cursor"""
+    after: Cursor
+    """Query values in the collection before the provided cursor"""
+    before: Cursor
+    """Filters to apply to the results set when querying from the collection"""
+    filter: seating_elementFilter
+    """Query the first `n` records in the collection"""
+    first: Int
+    """Query the last `n` records in the collection"""
+    last: Int
+    """
+    Skip n values from the after cursor. Alternative to cursor pagination. Backward pagination not supported.
+    """
+    offset: Int
+    """Sort order to apply to the collection"""
+    orderBy: [seating_elementOrderBy!]
+  ): seating_elementConnection
 }
 
 """
@@ -539,15 +668,115 @@ type app_settingsUpdateResponse {
   records: [app_settings!]!
 }
 
+type guest implements Node {
+  created_at: Datetime!
+  full_name: String!
+  id: UUID!
+  invite: invite
+  invite_id: UUID
+  """Globally Unique Record Identifier"""
+  nodeId: ID!
+  seat_assignment: seat_assignment
+}
+
+type guestConnection {
+  edges: [guestEdge!]!
+  pageInfo: PageInfo!
+}
+
+type guestDeleteResponse {
+  """Count of the records impacted by the mutation"""
+  affectedCount: Int!
+  """Array of records impacted by the mutation"""
+  records: [guest!]!
+}
+
+type guestEdge {
+  cursor: String!
+  node: guest!
+}
+
+input guestFilter {
+  """
+  Returns true only if all its inner filters are true, otherwise returns false
+  """
+  and: [guestFilter!]
+  created_at: DatetimeFilter
+  full_name: StringFilter
+  id: UUIDFilter
+  invite_id: UUIDFilter
+  nodeId: IDFilter
+  """Negates a filter"""
+  not: guestFilter
+  """
+  Returns true if at least one of its inner filters is true, otherwise returns false
+  """
+  or: [guestFilter!]
+}
+
+input guestInsertInput {
+  created_at: Datetime
+  full_name: String
+  id: UUID
+  invite_id: UUID
+}
+
+type guestInsertResponse {
+  """Count of the records impacted by the mutation"""
+  affectedCount: Int!
+  """Array of records impacted by the mutation"""
+  records: [guest!]!
+}
+
+input guestOrderBy {
+  created_at: OrderByDirection
+  full_name: OrderByDirection
+  id: OrderByDirection
+  invite_id: OrderByDirection
+}
+
+input guestUpdateInput {
+  created_at: Datetime
+  full_name: String
+  id: UUID
+  invite_id: UUID
+}
+
+type guestUpdateResponse {
+  """Count of the records impacted by the mutation"""
+  affectedCount: Int!
+  """Array of records impacted by the mutation"""
+  records: [guest!]!
+}
+
 type invite implements Node {
   created_at: Datetime!
   envelope_opened_at: Datetime
   first_opened_at: Datetime
+  guestCollection(
+    """Query values in the collection after the provided cursor"""
+    after: Cursor
+    """Query values in the collection before the provided cursor"""
+    before: Cursor
+    """Filters to apply to the results set when querying from the collection"""
+    filter: guestFilter
+    """Query the first `n` records in the collection"""
+    first: Int
+    """Query the last `n` records in the collection"""
+    last: Int
+    """
+    Skip n values from the after cursor. Alternative to cursor pagination. Backward pagination not supported.
+    """
+    offset: Int
+    """Sort order to apply to the collection"""
+    orderBy: [guestOrderBy!]
+  ): guestConnection
   id: UUID!
   message: String
   name: String
   """Globally Unique Record Identifier"""
   nodeId: ID!
+  number_of_attendees: Int!
   open_count: Int!
   rsvpCollection(
     """Query values in the collection after the provided cursor"""
@@ -601,6 +830,7 @@ input inviteFilter {
   nodeId: IDFilter
   """Negates a filter"""
   not: inviteFilter
+  number_of_attendees: IntFilter
   open_count: IntFilter
   """
   Returns true if at least one of its inner filters is true, otherwise returns false
@@ -616,6 +846,7 @@ input inviteInsertInput {
   id: UUID
   message: String
   name: String
+  number_of_attendees: Int
   open_count: Int
   sent: Boolean
 }
@@ -634,6 +865,7 @@ input inviteOrderBy {
   id: OrderByDirection
   message: OrderByDirection
   name: OrderByDirection
+  number_of_attendees: OrderByDirection
   open_count: OrderByDirection
   sent: OrderByDirection
 }
@@ -645,6 +877,7 @@ input inviteUpdateInput {
   id: UUID
   message: String
   name: String
+  number_of_attendees: Int
   open_count: Int
   sent: Boolean
 }
@@ -764,4 +997,232 @@ type rsvpUpdateResponse {
   affectedCount: Int!
   """Array of records impacted by the mutation"""
   records: [rsvp!]!
+}
+
+type seat_assignment implements Node {
+  created_at: Datetime!
+  element_id: UUID!
+  guest: guest
+  guest_id: UUID!
+  id: UUID!
+  """Globally Unique Record Identifier"""
+  nodeId: ID!
+  seat_index: Int!
+  seating_element: seating_element
+}
+
+type seat_assignmentConnection {
+  edges: [seat_assignmentEdge!]!
+  pageInfo: PageInfo!
+}
+
+type seat_assignmentDeleteResponse {
+  """Count of the records impacted by the mutation"""
+  affectedCount: Int!
+  """Array of records impacted by the mutation"""
+  records: [seat_assignment!]!
+}
+
+type seat_assignmentEdge {
+  cursor: String!
+  node: seat_assignment!
+}
+
+input seat_assignmentFilter {
+  """
+  Returns true only if all its inner filters are true, otherwise returns false
+  """
+  and: [seat_assignmentFilter!]
+  created_at: DatetimeFilter
+  element_id: UUIDFilter
+  guest_id: UUIDFilter
+  id: UUIDFilter
+  nodeId: IDFilter
+  """Negates a filter"""
+  not: seat_assignmentFilter
+  """
+  Returns true if at least one of its inner filters is true, otherwise returns false
+  """
+  or: [seat_assignmentFilter!]
+  seat_index: IntFilter
+}
+
+input seat_assignmentInsertInput {
+  created_at: Datetime
+  element_id: UUID
+  guest_id: UUID
+  id: UUID
+  seat_index: Int
+}
+
+type seat_assignmentInsertResponse {
+  """Count of the records impacted by the mutation"""
+  affectedCount: Int!
+  """Array of records impacted by the mutation"""
+  records: [seat_assignment!]!
+}
+
+input seat_assignmentOrderBy {
+  created_at: OrderByDirection
+  element_id: OrderByDirection
+  guest_id: OrderByDirection
+  id: OrderByDirection
+  seat_index: OrderByDirection
+}
+
+input seat_assignmentUpdateInput {
+  created_at: Datetime
+  element_id: UUID
+  guest_id: UUID
+  id: UUID
+  seat_index: Int
+}
+
+type seat_assignmentUpdateResponse {
+  """Count of the records impacted by the mutation"""
+  affectedCount: Int!
+  """Array of records impacted by the mutation"""
+  records: [seat_assignment!]!
+}
+
+type seating_element implements Node {
+  created_at: Datetime!
+  height: Float!
+  id: UUID!
+  kind: String!
+  label: String
+  """Globally Unique Record Identifier"""
+  nodeId: ID!
+  rotation: Float!
+  seat_assignmentCollection(
+    """Query values in the collection after the provided cursor"""
+    after: Cursor
+    """Query values in the collection before the provided cursor"""
+    before: Cursor
+    """Filters to apply to the results set when querying from the collection"""
+    filter: seat_assignmentFilter
+    """Query the first `n` records in the collection"""
+    first: Int
+    """Query the last `n` records in the collection"""
+    last: Int
+    """
+    Skip n values from the after cursor. Alternative to cursor pagination. Backward pagination not supported.
+    """
+    offset: Int
+    """Sort order to apply to the collection"""
+    orderBy: [seat_assignmentOrderBy!]
+  ): seat_assignmentConnection
+  seats_bottom: Int!
+  seats_left: Int!
+  seats_right: Int!
+  seats_top: Int!
+  width: Float!
+  x: Float!
+  y: Float!
+}
+
+type seating_elementConnection {
+  edges: [seating_elementEdge!]!
+  pageInfo: PageInfo!
+}
+
+type seating_elementDeleteResponse {
+  """Count of the records impacted by the mutation"""
+  affectedCount: Int!
+  """Array of records impacted by the mutation"""
+  records: [seating_element!]!
+}
+
+type seating_elementEdge {
+  cursor: String!
+  node: seating_element!
+}
+
+input seating_elementFilter {
+  """
+  Returns true only if all its inner filters are true, otherwise returns false
+  """
+  and: [seating_elementFilter!]
+  created_at: DatetimeFilter
+  height: FloatFilter
+  id: UUIDFilter
+  kind: StringFilter
+  label: StringFilter
+  nodeId: IDFilter
+  """Negates a filter"""
+  not: seating_elementFilter
+  """
+  Returns true if at least one of its inner filters is true, otherwise returns false
+  """
+  or: [seating_elementFilter!]
+  rotation: FloatFilter
+  seats_bottom: IntFilter
+  seats_left: IntFilter
+  seats_right: IntFilter
+  seats_top: IntFilter
+  width: FloatFilter
+  x: FloatFilter
+  y: FloatFilter
+}
+
+input seating_elementInsertInput {
+  created_at: Datetime
+  height: Float
+  id: UUID
+  kind: String
+  label: String
+  rotation: Float
+  seats_bottom: Int
+  seats_left: Int
+  seats_right: Int
+  seats_top: Int
+  width: Float
+  x: Float
+  y: Float
+}
+
+type seating_elementInsertResponse {
+  """Count of the records impacted by the mutation"""
+  affectedCount: Int!
+  """Array of records impacted by the mutation"""
+  records: [seating_element!]!
+}
+
+input seating_elementOrderBy {
+  created_at: OrderByDirection
+  height: OrderByDirection
+  id: OrderByDirection
+  kind: OrderByDirection
+  label: OrderByDirection
+  rotation: OrderByDirection
+  seats_bottom: OrderByDirection
+  seats_left: OrderByDirection
+  seats_right: OrderByDirection
+  seats_top: OrderByDirection
+  width: OrderByDirection
+  x: OrderByDirection
+  y: OrderByDirection
+}
+
+input seating_elementUpdateInput {
+  created_at: Datetime
+  height: Float
+  id: UUID
+  kind: String
+  label: String
+  rotation: Float
+  seats_bottom: Int
+  seats_left: Int
+  seats_right: Int
+  seats_top: Int
+  width: Float
+  x: Float
+  y: Float
+}
+
+type seating_elementUpdateResponse {
+  """Count of the records impacted by the mutation"""
+  affectedCount: Int!
+  """Array of records impacted by the mutation"""
+  records: [seating_element!]!
 }
