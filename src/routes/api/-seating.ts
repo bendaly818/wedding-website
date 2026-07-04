@@ -46,6 +46,7 @@ const GET_SEATING_PLAN = graphql(`
           seats_right
           seats_bottom
           seats_left
+          seat_offsets
         }
       }
     }
@@ -122,6 +123,7 @@ const CREATE_ELEMENT_MUTATION = graphql(`
         seats_right
         seats_bottom
         seats_left
+        seat_offsets
       }
     }
   }

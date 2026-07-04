@@ -14,6 +14,11 @@ export type SeatCounts = {
 	seats_right: number;
 	seats_bottom: number;
 	seats_left: number;
+	/**
+	 * Per-seat delta (local px) from the auto-computed position along the
+	 * side's parallel axis, indexed by seat index. Missing/short/null ⇒ 0.
+	 */
+	seat_offsets?: (number | null)[] | null;
 };
 
 export type SeatSide = "top" | "right" | "bottom" | "left";
@@ -37,10 +42,19 @@ export function seatPositions(el: SeatCounts): SeatPosition[] {
 	const out: SeatPosition[] = [];
 	let index = 0;
 
+	// Clamp at read-time so a table resized below a previously-valid offset
+	// self-corrects instead of rendering a seat past the corner.
+	const offsetAlong = (i: number, auto: number, sideLength: number) => {
+		const stored = el.seat_offsets?.[i] ?? 0;
+		const min = Math.min(CHAIR_RADIUS, sideLength / 2);
+		const max = Math.max(sideLength - CHAIR_RADIUS, sideLength / 2);
+		return Math.min(max, Math.max(min, auto + stored));
+	};
+
 	for (let i = 0; i < el.seats_top; i++, index++) {
 		out.push({
 			index,
-			x: (w * (i + 0.5)) / el.seats_top,
+			x: offsetAlong(index, (w * (i + 0.5)) / el.seats_top, w),
 			y: -CHAIR_GAP,
 			side: "top",
 		});
@@ -49,14 +63,18 @@ export function seatPositions(el: SeatCounts): SeatPosition[] {
 		out.push({
 			index,
 			x: w + CHAIR_GAP,
-			y: (h * (i + 0.5)) / el.seats_right,
+			y: offsetAlong(index, (h * (i + 0.5)) / el.seats_right, h),
 			side: "right",
 		});
 	}
 	for (let i = 0; i < el.seats_bottom; i++, index++) {
 		out.push({
 			index,
-			x: (w * (el.seats_bottom - i - 0.5)) / el.seats_bottom,
+			x: offsetAlong(
+				index,
+				(w * (el.seats_bottom - i - 0.5)) / el.seats_bottom,
+				w,
+			),
 			y: h + CHAIR_GAP,
 			side: "bottom",
 		});
@@ -65,7 +83,7 @@ export function seatPositions(el: SeatCounts): SeatPosition[] {
 		out.push({
 			index,
 			x: -CHAIR_GAP,
-			y: (h * (el.seats_left - i - 0.5)) / el.seats_left,
+			y: offsetAlong(index, (h * (el.seats_left - i - 0.5)) / el.seats_left, h),
 			side: "left",
 		});
 	}

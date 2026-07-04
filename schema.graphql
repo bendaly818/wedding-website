@@ -1112,6 +1112,7 @@ type seating_element implements Node {
     """Sort order to apply to the collection"""
     orderBy: [seat_assignmentOrderBy!]
   ): seat_assignmentConnection
+  seat_offsets: [Float]
   seats_bottom: Int!
   seats_left: Int!
   seats_right: Int!
@@ -1156,6 +1157,7 @@ input seating_elementFilter {
   """
   or: [seating_elementFilter!]
   rotation: FloatFilter
+  seat_offsets: FloatListFilter
   seats_bottom: IntFilter
   seats_left: IntFilter
   seats_right: IntFilter
@@ -1172,6 +1174,7 @@ input seating_elementInsertInput {
   kind: String
   label: String
   rotation: Float
+  seat_offsets: [Float]
   seats_bottom: Int
   seats_left: Int
   seats_right: Int
@@ -1211,6 +1214,7 @@ input seating_elementUpdateInput {
   kind: String
   label: String
   rotation: Float
+  seat_offsets: [Float]
   seats_bottom: Int
   seats_left: Int
   seats_right: Int
