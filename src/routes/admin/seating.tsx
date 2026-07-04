@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
 	CHAIR_RADIUS,
 	guestInitials,
+	type SeatPosition,
 	seatPositions,
 	totalSeats,
 } from "#/lib/seating";
@@ -75,7 +76,25 @@ type Gesture =
 			startDist: number;
 			startVb: ViewBox;
 			startMid: { x: number; y: number };
+	  }
+	| {
+			// Dragging one chair along its side's parallel axis. Starts as a
+			// potential click; `moved` flips once past the drag threshold.
+			type: "seat";
+			elementId: string;
+			seatIndex: number;
+			axis: "x" | "y";
+			startOffset: number;
+			auto: number;
+			sideLength: number;
+			rotation: number;
+			startClient: { x: number; y: number };
+			startWorld: { x: number; y: number };
+			moved: boolean;
 	  };
+
+/** Client-px movement below which a seat pointer-down counts as a click. */
+const SEAT_DRAG_THRESHOLD = 4;
 
 const snap = (v: number) => Math.round(v / SNAP) * SNAP;
 
@@ -125,7 +144,12 @@ function SeatingEditor() {
 
 	useEffect(() => {
 		if (!data) return;
-		if (dirtyIds.current.size === 0 && gestureRef.current?.type !== "element") {
+		const gestureType = gestureRef.current?.type;
+		if (
+			dirtyIds.current.size === 0 &&
+			gestureType !== "element" &&
+			gestureType !== "seat"
+		) {
 			setElements(data.elements);
 		}
 	}, [data]);
@@ -163,6 +187,7 @@ function SeatingEditor() {
 				seats_right: el.seats_right,
 				seats_bottom: el.seats_bottom,
 				seats_left: el.seats_left,
+				seat_offsets: el.seat_offsets,
 			}));
 		try {
 			await saveElements({ data: payload });
@@ -259,6 +284,7 @@ function SeatingEditor() {
 					seats_right: src.seats_right,
 					seats_bottom: src.seats_bottom,
 					seats_left: src.seats_left,
+					seat_offsets: src.seat_offsets,
 				},
 			}),
 		onSuccess: (created) => {
@@ -411,6 +437,34 @@ function SeatingEditor() {
 		setSelectedId(el.id);
 	};
 
+	// Chair pointer-down starts an ambiguous gesture: resolved as a click
+	// (assign/arm) on pointer-up if the pointer never travels past the
+	// threshold, or as a drag along the side's parallel axis otherwise.
+	const onChairPointerDown = (
+		e: React.PointerEvent,
+		el: SeatingElement,
+		seat: SeatPosition,
+	) => {
+		e.stopPropagation();
+		svgRef.current?.setPointerCapture(e.pointerId);
+		pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+		const axis = seat.side === "top" || seat.side === "bottom" ? "x" : "y";
+		const autoSeat = seatPositions({ ...el, seat_offsets: null })[seat.index];
+		gestureRef.current = {
+			type: "seat",
+			elementId: el.id,
+			seatIndex: seat.index,
+			axis,
+			startOffset: el.seat_offsets?.[seat.index] ?? 0,
+			auto: axis === "x" ? autoSeat.x : autoSeat.y,
+			sideLength: axis === "x" ? el.width : el.height,
+			rotation: el.rotation,
+			startClient: { x: e.clientX, y: e.clientY },
+			startWorld: toWorld(e.clientX, e.clientY),
+			moved: false,
+		};
+	};
+
 	const onSvgPointerMove = (e: React.PointerEvent<SVGSVGElement>) => {
 		if (!pointersRef.current.has(e.pointerId)) return;
 		pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -439,6 +493,36 @@ function SeatingEditor() {
 				x: snap(world.x - g.offsetX),
 				y: snap(world.y - g.offsetY),
 			});
+		} else if (g.type === "seat") {
+			if (!g.moved) {
+				const dist = Math.hypot(
+					e.clientX - g.startClient.x,
+					e.clientY - g.startClient.y,
+				);
+				if (dist < SEAT_DRAG_THRESHOLD) return;
+				g.moved = true;
+			}
+			const el = elementsRef.current.find((x) => x.id === g.elementId);
+			if (!el) return;
+			// Project pointer movement onto the side's parallel axis in the
+			// element's rotated frame; the perpendicular component is ignored.
+			const dx = world.x - g.startWorld.x;
+			const dy = world.y - g.startWorld.y;
+			const rad = (g.rotation * Math.PI) / 180;
+			const along =
+				g.axis === "x"
+					? dx * Math.cos(rad) + dy * Math.sin(rad)
+					: dy * Math.cos(rad) - dx * Math.sin(rad);
+			const pos = Math.min(
+				g.sideLength - CHAIR_RADIUS,
+				Math.max(CHAIR_RADIUS, snap(g.auto + g.startOffset + along)),
+			);
+			const offsets = Array.from(
+				{ length: totalSeats(el) },
+				(_, i) => el.seat_offsets?.[i] ?? 0,
+			);
+			offsets[g.seatIndex] = pos - g.auto;
+			updateElement(g.elementId, { seat_offsets: offsets });
 		} else if (g.type === "pan") {
 			setViewBox((vb) => ({
 				...vb,
@@ -450,7 +534,14 @@ function SeatingEditor() {
 
 	const onSvgPointerUp = (e: React.PointerEvent<SVGSVGElement>) => {
 		pointersRef.current.delete(e.pointerId);
-		if (pointersRef.current.size === 0) gestureRef.current = null;
+		if (pointersRef.current.size === 0) {
+			const g = gestureRef.current;
+			if (g?.type === "seat" && !g.moved) {
+				const el = elementsRef.current.find((x) => x.id === g.elementId);
+				if (el) onChairClick(el, g.seatIndex);
+			}
+			gestureRef.current = null;
+		}
 	};
 
 	// ── Seat interaction ───────────────────────────────────────────
@@ -717,6 +808,7 @@ function SeatingEditor() {
 								assignmentBySeat={assignmentBySeat}
 								guestById={guestById}
 								onPointerDown={(e) => onElementPointerDown(e, el)}
+								onChairPointerDown={(e, s) => onChairPointerDown(e, el, s)}
 								onChairClick={(i) => onChairClick(el, i)}
 								onChairDrop={(e, i) => onChairDrop(e, el, i)}
 							/>
@@ -963,6 +1055,7 @@ function ElementNode({
 	assignmentBySeat,
 	guestById,
 	onPointerDown,
+	onChairPointerDown,
 	onChairClick,
 	onChairDrop,
 }: {
@@ -972,6 +1065,7 @@ function ElementNode({
 	assignmentBySeat: Map<string, { guest_id: string }>;
 	guestById: Map<string, SeatingGuest>;
 	onPointerDown: (e: React.PointerEvent) => void;
+	onChairPointerDown: (e: React.PointerEvent, seat: SeatPosition) => void;
 	onChairClick: (seatIndex: number) => void;
 	onChairDrop: (e: React.DragEvent, seatIndex: number) => void;
 }) {
@@ -1033,12 +1127,9 @@ function ElementNode({
 								? `Seat ${s.index + 1}: ${guest.full_name}`
 								: `Seat ${s.index + 1}, empty`
 						}
-						// Act on pointerdown: letting it bubble starts the pan gesture,
-						// whose pointer capture swallows the derived click event.
-						onPointerDown={(e) => {
-							e.stopPropagation();
-							onChairClick(s.index);
-						}}
+						// Pointer-down starts a click-or-drag seat gesture; letting it
+						// bubble would start the pan gesture instead.
+						onPointerDown={(e) => onChairPointerDown(e, s)}
 						onKeyDown={(e) => e.key === "Enter" && onChairClick(s.index)}
 						onDragOver={(e) => e.preventDefault()}
 						onDrop={(e) => onChairDrop(e, s.index)}
@@ -1231,26 +1322,43 @@ function ElementInspector({
 			</div>
 
 			{el.kind === "table" || totalSeats(el) > 0 ? (
-				<div className="grid grid-cols-2 gap-2">
-					{seatSides.map(([key, label]) => (
-						<label key={key} className="flex items-center gap-2">
-							<span className="text-xs font-bold text-gray-400 uppercase w-14">
-								{label}
-							</span>
-							<input
-								type="number"
-								min={0}
-								max={30}
-								value={el[key]}
-								onChange={(e) =>
-									onChange({ [key]: Math.max(0, Number(e.target.value) || 0) })
-								}
-								className="w-full px-2 py-1.5 border rounded-lg text-base"
-								style={{ borderColor: "var(--card-border)" }}
-							/>
-						</label>
-					))}
-				</div>
+				<>
+					<div className="grid grid-cols-2 gap-2">
+						{seatSides.map(([key, label]) => (
+							<label key={key} className="flex items-center gap-2">
+								<span className="text-xs font-bold text-gray-400 uppercase w-14">
+									{label}
+								</span>
+								<input
+									type="number"
+									min={0}
+									max={30}
+									value={el[key]}
+									onChange={(e) =>
+										onChange({
+											[key]: Math.max(0, Number(e.target.value) || 0),
+										})
+									}
+									className="w-full px-2 py-1.5 border rounded-lg text-base"
+									style={{ borderColor: "var(--card-border)" }}
+								/>
+							</label>
+						))}
+					</div>
+					{el.seat_offsets?.some((o) => o) && (
+						<button
+							type="button"
+							onClick={() => onChange({ seat_offsets: null })}
+							className="py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors hover:opacity-80"
+							style={{
+								background: "var(--section-s2)",
+								color: "var(--color-wine)",
+							}}
+						>
+							Reset seat spacing
+						</button>
+					)}
+				</>
 			) : null}
 
 			<div className="mt-1 grid grid-cols-2 gap-2">
