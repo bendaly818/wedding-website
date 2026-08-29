@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as PrintSeatingRouteImport } from './routes/print/seating'
+import { Route as PrintBatchRouteImport } from './routes/print/batch'
 import { Route as PrintInviteIdRouteImport } from './routes/print/$inviteId'
 import { Route as IInviteIdRouteImport } from './routes/i/$inviteId'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
@@ -34,6 +35,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const PrintSeatingRoute = PrintSeatingRouteImport.update({
   id: '/print/seating',
   path: '/print/seating',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrintBatchRoute = PrintBatchRouteImport.update({
+  id: '/print/batch',
+  path: '/print/batch',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrintInviteIdRoute = PrintInviteIdRouteImport.update({
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/i/$inviteId': typeof IInviteIdRoute
   '/print/$inviteId': typeof PrintInviteIdRoute
+  '/print/batch': typeof PrintBatchRoute
   '/print/seating': typeof PrintSeatingRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -100,6 +107,7 @@ export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/i/$inviteId': typeof IInviteIdRoute
   '/print/$inviteId': typeof PrintInviteIdRoute
+  '/print/batch': typeof PrintBatchRoute
   '/print/seating': typeof PrintSeatingRoute
   '/admin': typeof AdminIndexRoute
 }
@@ -114,6 +122,7 @@ export interface FileRoutesById {
   '/auth/callback': typeof AuthCallbackRoute
   '/i/$inviteId': typeof IInviteIdRoute
   '/print/$inviteId': typeof PrintInviteIdRoute
+  '/print/batch': typeof PrintBatchRoute
   '/print/seating': typeof PrintSeatingRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -129,6 +138,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/i/$inviteId'
     | '/print/$inviteId'
+    | '/print/batch'
     | '/print/seating'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/i/$inviteId'
     | '/print/$inviteId'
+    | '/print/batch'
     | '/print/seating'
     | '/admin'
   id:
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/i/$inviteId'
     | '/print/$inviteId'
+    | '/print/batch'
     | '/print/seating'
     | '/admin/'
   fileRoutesById: FileRoutesById
@@ -169,6 +181,7 @@ export interface RootRouteChildren {
   AuthCallbackRoute: typeof AuthCallbackRoute
   IInviteIdRoute: typeof IInviteIdRoute
   PrintInviteIdRoute: typeof PrintInviteIdRoute
+  PrintBatchRoute: typeof PrintBatchRoute
   PrintSeatingRoute: typeof PrintSeatingRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -194,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/print/seating'
       fullPath: '/print/seating'
       preLoaderRoute: typeof PrintSeatingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/print/batch': {
+      id: '/print/batch'
+      path: '/print/batch'
+      fullPath: '/print/batch'
+      preLoaderRoute: typeof PrintBatchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/print/$inviteId': {
@@ -265,6 +285,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthCallbackRoute: AuthCallbackRoute,
   IInviteIdRoute: IInviteIdRoute,
   PrintInviteIdRoute: PrintInviteIdRoute,
+  PrintBatchRoute: PrintBatchRoute,
   PrintSeatingRoute: PrintSeatingRoute,
   AdminIndexRoute: AdminIndexRoute,
 }

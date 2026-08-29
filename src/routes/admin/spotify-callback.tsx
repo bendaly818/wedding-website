@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { getAuthUser } from "./index";
+import { getAuthUser } from "../api/-admin";
 import { exchangeSpotifyCode } from "../api/-spotify-playlist";
 
 export const Route = createFileRoute("/admin/spotify-callback")({

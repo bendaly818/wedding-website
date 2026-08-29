@@ -21,7 +21,7 @@ import {
 	seedGuestsFromInvites,
 	unassignSeat,
 } from "../api/-seating";
-import { getAuthUser } from "./index";
+import { getAuthUser } from "../api/-admin";
 
 export const Route = createFileRoute("/admin/seating")({
 	beforeLoad: async () => {

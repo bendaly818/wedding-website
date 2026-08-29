@@ -1,12 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
 import { useState } from "react";
 import { graphql } from "#/gql";
-import type { GetAllInvitesQuery } from "#/gql/graphql";
-import { createSupabaseServerClient } from "../../lib/supabase";
 import { supabaseGraphqlClient } from "../../lib/supabase-graphql";
+import { getAllInvites, getAuthContext, getAuthUser } from "../api/-admin";
 import {
 	disconnectSpotify,
 	getAllSongs,
@@ -14,74 +12,6 @@ import {
 	getSpotifyConnectionStatus,
 	syncSpotifyPlaylist,
 } from "../api/-spotify-playlist";
-
-/** Authenticates the request via Supabase Auth server (safe, not cookie-only). */
-async function getAuthContext() {
-	const supabase = await createSupabaseServerClient(getRequest());
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
-	// Session is needed only for its access_token (used in GraphQL headers).
-	// getUser() already validated the token; we just need the token string.
-	const {
-		data: { session },
-	} = await supabase.auth.getSession();
-	return { user, accessToken: session?.access_token ?? null };
-}
-
-export const getAuthUser = createServerFn({ method: "GET" }).handler(
-	async () => {
-		const { user } = await getAuthContext();
-		return user ?? null;
-	},
-);
-const GET_ALL_INVITES = graphql(`
-  query GetAllInvites {
-    inviteCollection(orderBy: [{ created_at: DescNullsLast }]) {
-      edges {
-        node {
-          id
-          name
-          message
-          sent
-          first_opened_at
-          open_count
-		  rsvpCollection {
-			edges {
-				node {
-					id
-					attending
-					dietary
-					transit
-					physical_invite
-					song_recommendations
-				}
-			}
-		  }
-        }
-      }
-    }
-  }
-`);
-
-export const getAllInvites = createServerFn({ method: "GET" }).handler(
-	async () => {
-		const { user, accessToken } = await getAuthContext();
-		if (!user) throw new Error("Unauthorized");
-
-		try {
-			const res = await supabaseGraphqlClient.request<GetAllInvitesQuery>(
-				GET_ALL_INVITES,
-				{},
-				{ Authorization: `Bearer ${accessToken}` },
-			);
-			return res.inviteCollection?.edges?.map((e) => e.node) || [];
-		} catch (e) {
-			console.error(e);
-			return [];
-		}
-	},
-);
 
 const UPDATE_INVITE_SENT_MUTATION = graphql(`
   mutation UpdateInviteSent($id: UUID!, $sent: Boolean!) {
@@ -775,6 +705,22 @@ function AdminDashboard() {
 						style={{ color: "var(--color-wine)", background: "transparent" }}
 					>
 						Seating Plan
+					</a>
+					<a
+						href="/print/batch"
+						target="_blank"
+						rel="noreferrer"
+						className="px-5 py-2 rounded-xl text-sm font-bold uppercase tracking-wider transition-all"
+						style={{ color: "var(--color-wine)", background: "transparent" }}
+					>
+						Print Invites (
+						{
+							invites.filter(
+								(i) =>
+									i.rsvpCollection?.edges?.[0]?.node?.physical_invite === true,
+							).length
+						}
+						)
 					</a>
 				</div>
 
